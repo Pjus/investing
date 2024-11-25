@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'chart_detail_page.dart';
 
 // MarketCard 위젯
 class MarketCard extends StatelessWidget {
@@ -48,7 +49,7 @@ class IndexPage extends StatelessWidget {
       backgroundColor: Colors.black,
       appBar: AppBar(
         backgroundColor: Colors.grey[900],
-        title: Text('Index'),
+        title: Text('Stock Invest'),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -57,7 +58,7 @@ class IndexPage extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // 섹션 1: 실시간 데이터
-              Text(
+              const Text(
                 "Index",
                 style: TextStyle(
                   color: Colors.white,
@@ -65,11 +66,11 @@ class IndexPage extends StatelessWidget {
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              SizedBox(height: 10),
+              const SizedBox(height: 10),
               Card(
                 color: Colors.grey[850],
                 child: ListTile(
-                  leading: Icon(Icons.show_chart, color: Colors.green),
+                  leading: const Icon(Icons.show_chart, color: Colors.green),
                   title: Text(
                     'S&P 500: 4,589.67 (+1.23%)',
                     style: TextStyle(color: Colors.white),
@@ -80,7 +81,13 @@ class IndexPage extends StatelessWidget {
                   ),
                   trailing: Icon(Icons.chevron_right, color: Colors.white),
                   onTap: () {
-                    // 클릭 시 상세 데이터 보기
+                    // 디테일 페이지로 이동
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => ChartDetailPage(ticker: 'aapl'),
+                      ),
+                    );
                   },
                 ),
               ),
