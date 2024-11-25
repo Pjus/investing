@@ -57,6 +57,7 @@ INSTALLED_APPS = [
     'rest_framework',  # DRF 추가
     'api',  # 새로 만든 앱 추가
     'corsheaders',
+    'accounts',
 ]
 
 MIDDLEWARE = [
