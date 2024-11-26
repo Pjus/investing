@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'chart_detail_page.dart';
+import 'stock_detail_page.dart';
+import 'snp500card.dart';
 
 // MarketCard 위젯
 class MarketCard extends StatelessWidget {
@@ -67,30 +68,7 @@ class IndexPage extends StatelessWidget {
                 ),
               ),
               const SizedBox(height: 10),
-              Card(
-                color: Colors.grey[850],
-                child: ListTile(
-                  leading: const Icon(Icons.show_chart, color: Colors.green),
-                  title: Text(
-                    'S&P 500: 4,589.67 (+1.23%)',
-                    style: TextStyle(color: Colors.white),
-                  ),
-                  subtitle: Text(
-                    'Last updated: 5 mins ago',
-                    style: TextStyle(color: Colors.grey),
-                  ),
-                  trailing: Icon(Icons.chevron_right, color: Colors.white),
-                  onTap: () {
-                    // 디테일 페이지로 이동
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => ChartDetailPage(ticker: 'aapl'),
-                      ),
-                    );
-                  },
-                ),
-              ),
+              SP500Card(),
               SizedBox(height: 20),
 
               // 섹션 2: 차트
