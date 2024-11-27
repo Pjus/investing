@@ -3,29 +3,39 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'stock_detail_page.dart'; // 디테일 페이지
 
-class SP500Card extends StatefulWidget {
+class MarketIndexCard extends StatefulWidget {
+  final String title; // 예: S&P 500, Dow Jones
+  final String symbol; // 예: ^GSPC, ^DJI
+  final String apiUrl; // 예: http://127.0.0.1:8000/api/snp500/
+
+  const MarketIndexCard({
+    required this.title,
+    required this.symbol,
+    required this.apiUrl,
+    Key? key,
+  }) : super(key: key);
+
   @override
-  _SP500CardState createState() => _SP500CardState();
+  _MarketIndexCardState createState() => _MarketIndexCardState();
 }
 
-class _SP500CardState extends State<SP500Card> {
-  Map<String, dynamic>? sp500Data;
+class _MarketIndexCardState extends State<MarketIndexCard> {
+  Map<String, dynamic>? indexData;
   bool isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    fetchSP500Data();
+    fetchIndexData();
   }
 
-  Future<void> fetchSP500Data() async {
+  Future<void> fetchIndexData() async {
     try {
-      final response =
-          await http.get(Uri.parse('http://127.0.0.1:8000/api/snp500/'));
+      final response = await http.get(Uri.parse(widget.apiUrl));
 
       if (response.statusCode == 200) {
         setState(() {
-          sp500Data = json.decode(response.body);
+          indexData = json.decode(response.body);
           isLoading = false;
         });
       } else {
@@ -33,7 +43,7 @@ class _SP500CardState extends State<SP500Card> {
           isLoading = false;
         });
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to fetch S&P 500 data')),
+          SnackBar(content: Text('Failed to fetch ${widget.title} data')),
         );
       }
     } catch (error) {
@@ -53,27 +63,27 @@ class _SP500CardState extends State<SP500Card> {
       child: ListTile(
         leading: const Icon(Icons.show_chart, color: Colors.green),
         title: isLoading
-            ? Text(
+            ? const Text(
                 'Loading...',
                 style: TextStyle(color: Colors.white),
               )
             : Text(
-                'S&P 500: ${sp500Data?['last_close']} (${sp500Data?['change_percent']}%)',
+                '${widget.title}: ${indexData?['last_close']} (${indexData?['change_percent']}%)',
                 style: TextStyle(color: Colors.white),
               ),
         subtitle: isLoading
             ? null
             : Text(
-                'Day Range: ${sp500Data?['day_range']}',
+                'Day Range: ${indexData?['day_range']}',
                 style: TextStyle(color: Colors.grey),
               ),
-        trailing: Icon(Icons.chevron_right, color: Colors.white),
+        trailing: const Icon(Icons.chevron_right, color: Colors.white),
         onTap: () {
           // 디테일 페이지로 이동
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => StockDetailPage(symbol: '^GSPC'),
+              builder: (context) => StockDetailPage(symbol: widget.symbol),
             ),
           );
         },

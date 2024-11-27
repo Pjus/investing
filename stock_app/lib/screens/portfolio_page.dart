@@ -8,7 +8,7 @@ class PortfolioPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Portfolio')),
+      appBar: AppBar(title: const Text('Portfolio')),
       body: isLoggedIn
           ? Center(
               child: Text('Portfolio Page', style: TextStyle(fontSize: 20)))

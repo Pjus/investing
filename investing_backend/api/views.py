@@ -1,3 +1,5 @@
+import pandas as pd
+from finvizfinance.news import News
 import yfinance as yf
 from .utils import get_stock_data
 from rest_framework.response import Response
@@ -31,10 +33,16 @@ class StockDataAPIView(APIView):
 
 
 class SP500APIView(APIView):
-    def get(self, request):
+    def get(self, request, index_name):
         try:
             # S&P 500 데이터 가져오기
-            ticker = '^GSPC'
+            if index_name == "snp500":
+                ticker = '^GSPC'
+            elif index_name == "dowjones":
+                ticker = '^DJI'
+            elif index_name == "nasdaq":
+                ticker = '^IXIC'
+
             stock = yf.Ticker(ticker)
             info = stock.history(period='1d')  # 1일 간의 데이터
             # 필요한 정보 추출
@@ -50,8 +58,27 @@ class SP500APIView(APIView):
                 "day_range": day_range,
             }
 
-            print(result)
-
             return Response(result, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class NewsAPIView(APIView):
+    def get(self, request):
+        try:
+            # 뉴스 데이터 가져오기
+            fnews = News()
+            all_news = fnews.get_news()
+            news_data = all_news['news']  # 뉴스 리스트
+
+            # Pandas DataFrame으로 변환
+            df = pd.DataFrame(news_data, columns=[
+                              "Date", "Title", "Source", "Link"])
+
+            # DataFrame을 JSON으로 변환
+            news_json = df.to_dict(orient="records")
+
+            # 응답 반환
+            return Response({"status": "success", "data": news_json}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"status": "error", "message": str(e)}, status=status.HTTP_400_BAD_REQUEST)

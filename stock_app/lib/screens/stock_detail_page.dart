@@ -39,7 +39,7 @@ class _StockDetailPageState extends State<StockDetailPage> {
           isLoading = false;
         });
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Failed to fetch data')),
+          const SnackBar(content: Text('Failed to fetch data')),
         );
       }
     } catch (error) {
