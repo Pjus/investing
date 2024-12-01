@@ -78,7 +78,15 @@ class NewsAPIView(APIView):
             # DataFrame을 JSON으로 변환
             news_json = df.to_dict(orient="records")
 
+            # 데이터가 비어있는 경우 처리
+            if not news_json:
+                return Response(
+                    {"status": "error", "message": "No news data to return"},
+                    status=status.HTTP_204_NO_CONTENT,
+                )
+
             # 응답 반환
             return Response({"status": "success", "data": news_json}, status=status.HTTP_200_OK)
+
         except Exception as e:
             return Response({"status": "error", "message": str(e)}, status=status.HTTP_400_BAD_REQUEST)

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class LoginPage extends StatelessWidget {
   final TextEditingController _usernameController = TextEditingController();
@@ -9,13 +11,33 @@ class LoginPage extends StatelessWidget {
     String username = _usernameController.text;
     String password = _passwordController.text;
 
-    if (username == 'admin' && password == '1234') {
-      SharedPreferences prefs = await SharedPreferences.getInstance();
-      await prefs.setBool('isLoggedIn', true);
-      Navigator.pop(context); // 메인 페이지로 복귀
-    } else {
+    final url = Uri.parse(
+        'http://127.0.0.1:8000/api/accounts/token/'); // Django 백엔드 JWT 엔드포인트
+
+    try {
+      final response = await http.post(
+        url,
+        body: {'username': username, 'password': password},
+      );
+
+      if (response.statusCode == 200) {
+        // 로그인 성공: JWT 토큰 저장
+        final data = json.decode(response.body);
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        await prefs.setString('accessToken', data['access']);
+        await prefs.setString('refreshToken', data['refresh']);
+
+        Navigator.pop(context); // 메인 페이지로 복귀
+      } else {
+        // 로그인 실패
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Invalid username or password')),
+        );
+      }
+    } catch (error) {
+      // 네트워크 오류 처리
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Invalid username or password')),
+        SnackBar(content: Text('Error: $error')),
       );
     }
   }
