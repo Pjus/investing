@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:stock_app/screens/utils/number_format.dart';
+import 'package:stock_app/screens/utils/utils.dart';
 
 class AdditionalInfoWidget extends StatelessWidget {
   final Map<String, dynamic> stockData;
@@ -19,8 +19,10 @@ class AdditionalInfoWidget extends StatelessWidget {
         childAspectRatio: 3.5,
       ),
       children: [
-        _buildInfoTile('52-Week Low - High', '${formatNumber(stockData['fiftyTwoWeekLow'])} - ${formatNumber(stockData['fiftyTwoWeekHigh'])}'),
-        _buildInfoTile('Market Cap', '\$${formatNumber(stockData['marketCap'])}'),
+        _buildInfoTile('52-Week Low - High',
+            '${formatNumber(stockData['fiftyTwoWeekLow'])} - ${formatNumber(stockData['fiftyTwoWeekHigh'])}'),
+        _buildInfoTile(
+            'Market Cap', '\$${formatNumber(stockData['marketCap'])}'),
         _buildInfoTile('Volume', formatNumber(stockData['volume'])),
         _buildInfoTile('Dividend Yield', '${stockData['dividendYield']}%'),
         _buildInfoTile('Beta', '${stockData['beta']}'),

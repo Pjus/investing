@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'stock_detail_page.dart'; // 디테일 페이지
+import '../stock_detail_page.dart'; // 디테일 페이지
 
 class MarketIndexCard extends StatefulWidget {
   final String title; // 예: S&P 500, Dow Jones

@@ -5,7 +5,7 @@ import 'portfolio_page.dart'; // Portfolio 페이지
 import 'setting_page.dart'; // Settings 페이지
 import 'notification_page.dart'; // 알림 페이지
 import 'account_page.dart'; // 계정 페이지
-import 'auth_provider.dart'; // AuthProvider
+import 'utils/auth_provider.dart'; // AuthProvider
 import 'package:provider/provider.dart';
 
 class MainScreen extends StatefulWidget {
@@ -47,7 +47,7 @@ class _MainScreenState extends State<MainScreen> {
             onPressed: () {
               Navigator.push(
                 context,
-                MaterialPageRoute(builder: (context) =>  NotificationPage()),
+                MaterialPageRoute(builder: (context) => NotificationPage()),
               );
             },
           ),
@@ -104,7 +104,8 @@ class _MainScreenState extends State<MainScreen> {
                       TextButton(
                         onPressed: () {
                           Navigator.pop(context); // 다이얼로그 닫기
-                          Navigator.pushNamed(context, '/signup'); // 회원가입 화면으로 이동
+                          Navigator.pushNamed(
+                              context, '/signup'); // 회원가입 화면으로 이동
                         },
                         child: const Text('Sign Up'),
                       ),
@@ -114,7 +115,6 @@ class _MainScreenState extends State<MainScreen> {
               }
             },
           ),
-
         ],
       ),
       body: _pages[_selectedIndex],

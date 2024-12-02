@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'stock_chart.dart';
+import 'utils/stock_chart.dart';
 
 class StockScreen extends StatefulWidget {
   @override

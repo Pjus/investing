@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'market_index_card.dart'; // MarketIndexCard 위젯 정의 파일
+import 'widgets/market_index_card.dart'; // MarketIndexCard 위젯 정의 파일
 
 const marketIndex = [
   MarketIndexCard(

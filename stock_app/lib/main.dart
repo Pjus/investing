@@ -3,15 +3,14 @@ import 'package:provider/provider.dart';
 import 'package:stock_app/screens/main_screen.dart';
 import 'package:stock_app/screens/login_page.dart';
 import 'package:stock_app/screens/signup_page.dart';
-import 'package:stock_app/screens/auth_provider.dart';
-import 'package:stock_app/screens/index_page.dart';
-
+import 'package:stock_app/screens/utils/auth_provider.dart';
 
 void main() {
   runApp(
     MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => AuthProvider()..checkLoginStatus()),
+        ChangeNotifierProvider(
+            create: (_) => AuthProvider()..checkLoginStatus()),
       ],
       child: MyApp(),
     ),

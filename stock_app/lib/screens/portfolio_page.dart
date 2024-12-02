@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'auth_provider.dart'; // AuthProvider import
+import 'utils/auth_provider.dart'; // AuthProvider import
 
 class PortfolioPage extends StatelessWidget {
   const PortfolioPage({super.key});

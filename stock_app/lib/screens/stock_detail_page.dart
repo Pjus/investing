@@ -1,9 +1,9 @@
+import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
-import 'package:fl_chart/fl_chart.dart';
+import 'package:interactive_chart/interactive_chart.dart';
 import 'dart:convert';
 import 'package:stock_app/screens/widgets/additional_info_widget.dart';
-import 'package:stock_app/screens/widgets/price_chart_widget.dart';
 import 'package:stock_app/screens/widgets/stock_info_widget.dart';
 
 class StockDetailPage extends StatefulWidget {
@@ -49,38 +49,29 @@ class _StockDetailPageState extends State<StockDetailPage> {
     setState(() {
       isLoading = false;
     });
-    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+    ScaffoldMessenger.of(context)
+        .showSnackBar(SnackBar(content: Text(message)));
   }
 
-  List<FlSpot> _getChartSpots() {
+  List<CandleData> _getCandleData() {
     if (stockData == null || stockData!['data'] == null) return [];
 
     final data = stockData!['data'] as List<dynamic>;
-    DateTime startDate = DateTime.parse(data.first['Date']);
-
     return data.map((entry) {
-      final date = DateTime.parse(entry['Date']);
-      final closePrice = (entry['Close'] as num?)?.toDouble() ?? 0.0;
-      return FlSpot(date.difference(startDate).inDays.toDouble(), closePrice);
+      return CandleData(
+        timestamp: DateTime.parse(entry['Date']).millisecondsSinceEpoch,
+        open: (entry['Open'] as num?)?.toDouble(),
+        high: (entry['High'] as num?)?.toDouble(),
+        low: (entry['Low'] as num?)?.toDouble(),
+        close: (entry['Close'] as num?)?.toDouble(),
+        volume: (entry['Volume'] as num?)?.toDouble(),
+      );
     }).toList();
-  }
-
-  double _calculateInterval(BuildContext context, int dataLength) {
-    final screenWidth = MediaQuery.of(context).size.width;
-
-    if (screenWidth < 400) {
-      return dataLength / 2; // Small screens
-    } else if (screenWidth < 800) {
-      return dataLength / 5; // Medium screens
-    } else {
-      return dataLength / 8; // Large screens
-    }
   }
 
   @override
   Widget build(BuildContext context) {
-    final spots = _getChartSpots();
-    final interval = _calculateInterval(context, spots.length);
+    final candleData = _getCandleData();
 
     return Scaffold(
       appBar: AppBar(
@@ -98,17 +89,40 @@ class _StockDetailPageState extends State<StockDetailPage> {
                         StockInfoWidget(stockData: stockData!),
                         const SizedBox(height: 20),
                         const Text(
-                          'Price Chart',
+                          'Candlestick Chart',
                           style: TextStyle(
                               fontSize: 18, fontWeight: FontWeight.bold),
                         ),
                         const SizedBox(height: 10),
                         SizedBox(
-                          height: 300,
-                          child: PriceChartWidget(
-                            stockData: stockData!,
-                            spots: spots,
-                            interval: interval,
+                          height: 500,
+                          child: InteractiveChart(
+                            candles: candleData,
+                            style: ChartStyle(
+                              priceGainColor: Colors.green,
+                              priceLossColor: Colors.red,
+                              volumeColor: Colors.blue.withOpacity(0.5),
+                              trendLineStyles: [
+                                Paint()
+                                  ..strokeWidth = 2.0
+                                  ..strokeCap = StrokeCap.round
+                                  ..color = Colors.orange,
+                              ],
+                              selectionHighlightColor:
+                                  Colors.blue.withOpacity(0.2),
+                              overlayBackgroundColor:
+                                  Colors.black.withOpacity(0.7),
+                              overlayTextStyle: const TextStyle(
+                                  color: Colors.white, fontSize: 12),
+                              volumeHeightFactor: 0.2,
+                            ),
+                            overlayInfo: (candle) => {
+                              "Open": "${candle.open?.toStringAsFixed(2)}",
+                              "High": "${candle.high?.toStringAsFixed(2)}",
+                              "Low": "${candle.low?.toStringAsFixed(2)}",
+                              "Close": "${candle.close?.toStringAsFixed(2)}",
+                              "Volume": "${candle.volume?.toStringAsFixed(2)}",
+                            },
                           ),
                         ),
                         const SizedBox(height: 20),

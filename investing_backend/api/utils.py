@@ -45,10 +45,10 @@ def get_stock_data(symbol, period="1y", interval="1d"):
         # datetime을 문자열로 변환
         if 'Datetime' in historical_data.columns:
             historical_data['Date'] = historical_data['Datetime'].dt.strftime(
-                '%Y-%m-%d %H:%M:%S')
+                '%Y-%m-%d')
         else:
             historical_data['Date'] = historical_data['Date'].dt.strftime(
-                '%Y-%m-%d %H:%M:%S')
+                '%Y-%m-%d')
 
         # 데이터 변환
         result = historical_data.to_dict(orient="records")

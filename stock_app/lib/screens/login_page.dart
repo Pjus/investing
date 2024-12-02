@@ -3,7 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:provider/provider.dart';
-import 'auth_provider.dart';
+import 'utils/auth_provider.dart';
 
 class LoginPage extends StatelessWidget {
   final TextEditingController _usernameController = TextEditingController();
@@ -67,6 +67,7 @@ class LoginPage extends StatelessWidget {
                 labelText: 'Username',
                 border: OutlineInputBorder(),
               ),
+              onSubmitted: (_) => _login(context), // 엔터 키 입력 시 로그인
             ),
             const SizedBox(height: 16),
             TextField(
@@ -76,6 +77,7 @@ class LoginPage extends StatelessWidget {
                 border: OutlineInputBorder(),
               ),
               obscureText: true,
+              onSubmitted: (_) => _login(context), // 엔터 키 입력 시 로그인
             ),
             const SizedBox(height: 20),
             ElevatedButton(
