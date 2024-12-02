@@ -1,16 +1,20 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'stock_detail_page.dart';
 import 'market_index_page.dart';
 import 'news_page.dart';
 
+import 'auth_provider.dart'; // AuthProvider import
+
+
 // Index 페이지
 class IndexPage extends StatelessWidget {
-  final bool isLoggedIn;
-
-  const IndexPage({super.key, required this.isLoggedIn});
+  const IndexPage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final authProvider = Provider.of<AuthProvider>(context);
+
     return Scaffold(
       backgroundColor: Colors.black,
       body: NestedScrollView(
@@ -46,7 +50,7 @@ class IndexPage extends StatelessWidget {
                     ),
 
                     // 포트폴리오 섹션: 로그인 여부에 따라 표시
-                    if (isLoggedIn)
+                    if (authProvider.isLoggedIn)
                       _buildPortfolioSection()
                     else
                       _buildLoginPrompt(context),

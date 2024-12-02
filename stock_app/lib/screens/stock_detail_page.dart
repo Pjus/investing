@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
-import 'package:fl_chart/fl_chart.dart'; // 차트 패키지 추가
 import 'package:http/http.dart' as http;
+import 'package:fl_chart/fl_chart.dart';
 import 'dart:convert';
+import 'package:stock_app/screens/widgets/additional_info_widget.dart';
+import 'package:stock_app/screens/widgets/price_chart_widget.dart';
+import 'package:stock_app/screens/widgets/stock_info_widget.dart';
 
 class StockDetailPage extends StatefulWidget {
   final String symbol;
 
-  StockDetailPage({required this.symbol});
+  const StockDetailPage({Key? key, required this.symbol}) : super(key: key);
 
   @override
   _StockDetailPageState createState() => _StockDetailPageState();
@@ -35,45 +38,56 @@ class _StockDetailPageState extends State<StockDetailPage> {
           isLoading = false;
         });
       } else {
-        setState(() {
-          isLoading = false;
-        });
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Failed to fetch data')),
-        );
+        _showErrorSnackBar('Failed to fetch data');
       }
     } catch (error) {
-      setState(() {
-        isLoading = false;
-      });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error: $error')),
-      );
+      _showErrorSnackBar('Error: $error');
     }
+  }
+
+  void _showErrorSnackBar(String message) {
+    setState(() {
+      isLoading = false;
+    });
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
   }
 
   List<FlSpot> _getChartSpots() {
     if (stockData == null || stockData!['data'] == null) return [];
 
     final data = stockData!['data'] as List<dynamic>;
-    List<FlSpot> spots = [];
-    for (int i = 0; i < data.length; i++) {
-      double x = i.toDouble();
-      double y =
-          data[i]['Close'] != null ? (data[i]['Close'] as num).toDouble() : 0.0;
-      spots.add(FlSpot(x, y));
+    DateTime startDate = DateTime.parse(data.first['Date']);
+
+    return data.map((entry) {
+      final date = DateTime.parse(entry['Date']);
+      final closePrice = (entry['Close'] as num?)?.toDouble() ?? 0.0;
+      return FlSpot(date.difference(startDate).inDays.toDouble(), closePrice);
+    }).toList();
+  }
+
+  double _calculateInterval(BuildContext context, int dataLength) {
+    final screenWidth = MediaQuery.of(context).size.width;
+
+    if (screenWidth < 400) {
+      return dataLength / 2; // Small screens
+    } else if (screenWidth < 800) {
+      return dataLength / 5; // Medium screens
+    } else {
+      return dataLength / 8; // Large screens
     }
-    return spots;
   }
 
   @override
   Widget build(BuildContext context) {
+    final spots = _getChartSpots();
+    final interval = _calculateInterval(context, spots.length);
+
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.symbol),
       ),
       body: isLoading
-          ? Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator())
           : stockData != null
               ? SingleChildScrollView(
                   child: Padding(
@@ -81,96 +95,36 @@ class _StockDetailPageState extends State<StockDetailPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // 종목 기본 정보
-                        Text(
-                          stockData!['longName'] ?? 'Unknown Company',
-                          style: TextStyle(
-                              fontSize: 24, fontWeight: FontWeight.bold),
-                        ),
-                        Text(
-                          'Industry: ${stockData!['industry'] ?? 'N/A'}',
-                          style: TextStyle(fontSize: 16),
-                        ),
-                        Text(
-                          'Sector: ${stockData!['sector'] ?? 'N/A'}',
-                          style: TextStyle(fontSize: 16),
-                        ),
-                        SizedBox(height: 20),
-                        Text(
-                          'Current Price: \$${stockData!['currentPrice'] ?? 'N/A'}',
-                          style: TextStyle(
-                              fontSize: 20, fontWeight: FontWeight.bold),
-                        ),
-                        SizedBox(height: 20),
-
-                        // 차트 섹션
-                        Text(
+                        StockInfoWidget(stockData: stockData!),
+                        const SizedBox(height: 20),
+                        const Text(
                           'Price Chart',
                           style: TextStyle(
                               fontSize: 18, fontWeight: FontWeight.bold),
                         ),
-                        SizedBox(height: 10),
-                        Container(
+                        const SizedBox(height: 10),
+                        SizedBox(
                           height: 300,
-                          child: LineChart(
-                            LineChartData(
-                              gridData: FlGridData(show: false),
-                              titlesData: FlTitlesData(show: false),
-                              borderData: FlBorderData(
-                                show: true,
-                                border: Border.all(
-                                  color: const Color(0xff37434d),
-                                  width: 1,
-                                ),
-                              ),
-                              lineBarsData: [
-                                LineChartBarData(
-                                  spots: _getChartSpots(),
-                                  isCurved: true,
-                                  barWidth: 2,
-                                  belowBarData: BarAreaData(show: false),
-                                ),
-                              ],
-                            ),
+                          child: PriceChartWidget(
+                            stockData: stockData!,
+                            spots: spots,
+                            interval: interval,
                           ),
                         ),
-                        SizedBox(height: 20),
-
-                        // 추가 정보
-                        Divider(),
-                        Text(
+                        const SizedBox(height: 20),
+                        const Divider(),
+                        const Text(
                           'Additional Information',
                           style: TextStyle(
                               fontSize: 18, fontWeight: FontWeight.bold),
                         ),
-                        SizedBox(height: 10),
-                        Text(
-                          '52-Week High: \$${stockData!['fiftyTwoWeekHigh'] ?? 'N/A'}',
-                          style: TextStyle(fontSize: 16),
-                        ),
-                        Text(
-                          '52-Week Low: \$${stockData!['fiftyTwoWeekLow'] ?? 'N/A'}',
-                          style: TextStyle(fontSize: 16),
-                        ),
-                        Text(
-                          'Market Cap: ${stockData!['marketCap'] ?? 'N/A'}',
-                          style: TextStyle(fontSize: 16),
-                        ),
-                        Text(
-                          'Dividend Yield: ${stockData!['dividendYield'] ?? 'N/A'}%',
-                          style: TextStyle(fontSize: 16),
-                        ),
-                        Text(
-                          'Beta: ${stockData!['beta'] ?? 'N/A'}',
-                          style: TextStyle(fontSize: 16),
-                        ),
+                        const SizedBox(height: 10),
+                        AdditionalInfoWidget(stockData: stockData!),
                       ],
                     ),
                   ),
                 )
-              : Center(
-                  child: Text('No data available'),
-                ),
+              : const Center(child: Text('No data available')),
     );
   }
 }

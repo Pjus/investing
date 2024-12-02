@@ -2,13 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:provider/provider.dart';
+import 'auth_provider.dart';
 
 class LoginPage extends StatelessWidget {
   final TextEditingController _usernameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
   Future<void> _login(BuildContext context) async {
-    String username = _usernameController.text;
+    String username = _usernameController.text.trim();
     String password = _passwordController.text;
 
     final url = Uri.parse(
@@ -17,21 +19,26 @@ class LoginPage extends StatelessWidget {
     try {
       final response = await http.post(
         url,
-        body: {'username': username, 'password': password},
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({'username': username, 'password': password}),
       );
 
       if (response.statusCode == 200) {
-        // 로그인 성공: JWT 토큰 저장
+        // 로그인 성공
         final data = json.decode(response.body);
         SharedPreferences prefs = await SharedPreferences.getInstance();
         await prefs.setString('accessToken', data['access']);
         await prefs.setString('refreshToken', data['refresh']);
 
-        Navigator.pop(context); // 메인 페이지로 복귀
+        // AuthProvider 상태 업데이트
+        final authProvider = Provider.of<AuthProvider>(context, listen: false);
+        authProvider.logIn();
+
+        Navigator.pop(context); // 로그인 후 메인 화면으로 복귀
       } else {
         // 로그인 실패
         ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Invalid username or password')),
+          const SnackBar(content: Text('Invalid username or password')),
         );
       }
     } catch (error) {
@@ -45,7 +52,10 @@ class LoginPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Log In')),
+      appBar: AppBar(
+        title: const Text('Log In'),
+        backgroundColor: Colors.grey[900],
+      ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
@@ -53,17 +63,27 @@ class LoginPage extends StatelessWidget {
           children: [
             TextField(
               controller: _usernameController,
-              decoration: InputDecoration(labelText: 'Username'),
+              decoration: const InputDecoration(
+                labelText: 'Username',
+                border: OutlineInputBorder(),
+              ),
             ),
+            const SizedBox(height: 16),
             TextField(
               controller: _passwordController,
-              decoration: InputDecoration(labelText: 'Password'),
+              decoration: const InputDecoration(
+                labelText: 'Password',
+                border: OutlineInputBorder(),
+              ),
               obscureText: true,
             ),
-            SizedBox(height: 20),
+            const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () => _login(context),
-              child: Text('Log In'),
+              style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.blue,
+              ),
+              child: const Text('Log In'),
             ),
           ],
         ),

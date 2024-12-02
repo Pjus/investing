@@ -1,21 +1,39 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'auth_provider.dart'; // AuthProvider import
 
 class PortfolioPage extends StatelessWidget {
-  final bool isLoggedIn;
-
-  PortfolioPage({required this.isLoggedIn});
+  const PortfolioPage({super.key});
 
   @override
   Widget build(BuildContext context) {
+    final authProvider = Provider.of<AuthProvider>(context);
+
     return Scaffold(
-      appBar: AppBar(title: const Text('Portfolio')),
-      body: isLoggedIn
-          ? Center(
-              child: Text('Portfolio Page', style: TextStyle(fontSize: 20)))
-          : Center(
+      backgroundColor: Colors.black,
+      body: authProvider.isLoggedIn
+          ? const Center(
               child: Text(
-                'Please log in to access Portfolio',
-                style: TextStyle(fontSize: 16, color: Colors.grey),
+                'Your Portfolio Details Here',
+                style: TextStyle(color: Colors.white),
+              ),
+            )
+          : Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text(
+                    'Please log in to view your portfolio.',
+                    style: TextStyle(color: Colors.white),
+                  ),
+                  const SizedBox(height: 20),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.pushNamed(context, '/login'); // 로그인 페이지로 이동
+                    },
+                    child: const Text('Log In'),
+                  ),
+                ],
               ),
             ),
     );
