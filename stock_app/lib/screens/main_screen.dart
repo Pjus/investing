@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'index_page.dart'; // Index 페이지
 import 'chart_page.dart'; // Chart 페이지
+import 'favoriate_page.dart';
 import 'portfolio_page.dart'; // Portfolio 페이지
 import 'setting_page.dart'; // Settings 페이지
 import 'notification_page.dart'; // 알림 페이지
@@ -20,7 +21,7 @@ class _MainScreenState extends State<MainScreen> {
 
   final List<Widget> _pages = [
     IndexPage(), // Index 페이지
-    ChartsPage(), // Charts 페이지
+    FavoritesPage(), // Charts 페이지
     PortfolioPage(), // Portfolio 페이지
     SettingsPage(), // Settings 페이지
   ];
@@ -39,7 +40,7 @@ class _MainScreenState extends State<MainScreen> {
       backgroundColor: Colors.black,
       appBar: AppBar(
         backgroundColor: Colors.grey[900],
-        title: const Text('Index Page'),
+        title: const Text('Stock App'),
         actions: [
           // 알림 아이콘
           IconButton(

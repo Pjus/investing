@@ -26,3 +26,27 @@ class Stock(models.Model):
 
     def __str__(self):
         return f"{self.ticker} - {self.name}"
+
+
+class Favorite(models.Model):
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="favorites")
+    ticker = models.CharField(max_length=10)  # 주식 티커
+    name = models.CharField(max_length=100)  # 주식 이름
+    created_at = models.DateTimeField(auto_now_add=True)  # 즐겨찾기 추가 시간
+
+    class Meta:
+        unique_together = ('user', 'ticker')  # 동일 사용자와 티커 조합 중복 방지
+
+    def __str__(self):
+        return f"{self.user.username} - {self.ticker}"
+
+
+class Portfolio(models.Model):
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name='portfolio')
+    ticker = models.CharField(max_length=10)
+    shares = models.FloatField()
+
+    def __str__(self):
+        return f"{self.ticker} - {self.shares} shares"

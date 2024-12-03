@@ -1,5 +1,5 @@
+from .models import Portfolio, Watchlist, Favorite
 from rest_framework import serializers
-from .models import Watchlist
 
 
 class WatchlistSerializer(serializers.ModelSerializer):
@@ -80,3 +80,22 @@ class StockDetailSerializer(serializers.Serializer):
 
     # 기타
     financialCurrency = serializers.CharField(required=False, allow_null=True)
+
+
+class FavoriteSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Favorite
+        fields = ['id', 'ticker', 'name', 'created_at']
+
+    def validate(self, data):
+        user = self.context['request'].user
+        if Favorite.objects.filter(user=user, ticker=data['ticker']).exists():
+            raise serializers.ValidationError(
+                {"ticker": "This stock is already in your favorites."})
+        return data
+
+
+class PortfolioSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Portfolio
+        fields = ['id', 'ticker', 'shares']

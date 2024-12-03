@@ -1,13 +1,14 @@
-import pandas as pd
-from finvizfinance.news import News
-import yfinance as yf
-from .utils import get_stock_data
-from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework import viewsets
-from .models import Watchlist
-from .serializers import WatchlistSerializer, StockDetailSerializer
-from rest_framework import status
+from rest_framework.response import Response
+from rest_framework.permissions import IsAuthenticated
+from rest_framework import status, permissions, viewsets, status
+import pandas as pd
+import yfinance as yf
+from finvizfinance.news import News
+
+from .utils import get_stock_data
+from .models import Favorite, Portfolio, Watchlist
+from .serializers import PortfolioSerializer, FavoriteSerializer, WatchlistSerializer, StockDetailSerializer
 
 
 class WatchlistViewSet(viewsets.ModelViewSet):
@@ -90,3 +91,62 @@ class NewsAPIView(APIView):
 
         except Exception as e:
             return Response({"status": "error", "message": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+
+class FavoriteAPIView(APIView):
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get(self, request):
+        # 현재 로그인된 사용자의 즐겨찾기 목록 반환
+        favorites = Favorite.objects.filter(user=request.user)
+        serializer = FavoriteSerializer(favorites, many=True)
+        return Response({"status": "success", "data": serializer.data}, status=status.HTTP_200_OK)
+
+    def post(self, request):
+        data = request.data
+        serializer = FavoriteSerializer(
+            data=data, context={'request': request})
+        if serializer.is_valid():
+            serializer.save(user=request.user)
+            return Response({"status": "success", "data": serializer.data}, status=status.HTTP_201_CREATED)
+        return Response({"status": "error", "errors": serializer.errors}, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request):
+        # 즐겨찾기 삭제
+        ticker = request.data.get('ticker')
+        favorite = Favorite.objects.filter(
+            user=request.user, ticker=ticker).first()
+        if favorite:
+            favorite.delete()
+            return Response({"status": "success", "message": "Favorite deleted"}, status=status.HTTP_200_OK)
+        return Response({"status": "error", "message": "Favorite not found"}, status=status.HTTP_404_NOT_FOUND)
+
+
+class PortfolioListView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        portfolio = Portfolio.objects.filter(user=request.user)
+        serializer = PortfolioSerializer(portfolio, many=True)
+        return Response({"data": serializer.data})
+
+    def post(self, request):
+        data = request.data
+        data['user'] = request.user.id
+        serializer = PortfolioSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=201)
+        return Response(serializer.errors, status=400)
+
+
+class PortfolioDetailView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request, ticker):
+        try:
+            stock = Portfolio.objects.get(user=request.user, ticker=ticker)
+            stock.delete()
+            return Response(status=204)
+        except Portfolio.DoesNotExist:
+            return Response({"error": "Stock not found"}, status=404)

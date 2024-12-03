@@ -5,19 +5,23 @@ import 'package:interactive_chart/interactive_chart.dart';
 import 'dart:convert';
 import 'package:stock_app/screens/widgets/additional_info_widget.dart';
 import 'package:stock_app/screens/widgets/stock_info_widget.dart';
+import 'package:provider/provider.dart';
+import 'package:stock_app/screens/utils/dark_mode_provider.dart';
 
 class StockDetailPage extends StatefulWidget {
   final String symbol;
 
-  const StockDetailPage({Key? key, required this.symbol}) : super(key: key);
+  const StockDetailPage({super.key, required this.symbol});
 
   @override
+  // ignore: library_private_types_in_public_api
   _StockDetailPageState createState() => _StockDetailPageState();
 }
 
 class _StockDetailPageState extends State<StockDetailPage> {
   Map<String, dynamic>? stockData;
   final ScrollController _scrollController = ScrollController();
+
   bool _disableScroll = false;
   bool _isPointerInsideChart = false; // 차트 내부 상태 추적
   bool isLoading = true;
@@ -78,7 +82,6 @@ class _StockDetailPageState extends State<StockDetailPage> {
       setState(() {
         _disableScroll = true;
       });
-      print('Zooming with scrollDelta: ${event.scrollDelta}');
     } else {
       // 차트 영역 밖에서 스크롤 복구
       setState(() {
@@ -87,13 +90,55 @@ class _StockDetailPageState extends State<StockDetailPage> {
     }
   }
 
+  bool _showAverage = false;
+
   @override
   Widget build(BuildContext context) {
+    final darkModeProvider = Provider.of<DarkModeProvider>(context);
     final candleData = _getCandleData();
+
+    computeTrendLines() {
+      final ma7 = CandleData.computeMA(candleData, 7);
+      final ma30 = CandleData.computeMA(candleData, 30);
+      final ma90 = CandleData.computeMA(candleData, 90);
+
+      for (int i = 0; i < candleData.length; i++) {
+        candleData[i].trends = [ma7[i], ma30[i], ma90[i]];
+      }
+    }
+
+    removeTrendLines() {
+      for (final data in candleData) {
+        data.trends = [];
+      }
+    }
 
     return Scaffold(
       appBar: AppBar(
         title: Text(widget.symbol),
+        // actions: [
+        //   IconButton(
+        //     icon: Icon(darkModeProvider.isDarkMode
+        //         ? Icons.dark_mode
+        //         : Icons.light_mode),
+        //     onPressed: () {
+        //       darkModeProvider.toggleDarkMode();
+        //     },
+        //   ),
+        //   IconButton(
+        //     icon: Icon(
+        //       _showAverage ? Icons.show_chart : Icons.bar_chart_outlined,
+        //     ),
+        //     onPressed: () {
+        //       setState(() => _showAverage = !_showAverage);
+        //       if (_showAverage) {
+        //         computeTrendLines();
+        //       } else {
+        //         removeTrendLines();
+        //       }
+        //     },
+        //   ),
+        // ],
       ),
       body: isLoading
           ? const Center(child: CircularProgressIndicator())
@@ -138,17 +183,11 @@ class _StockDetailPageState extends State<StockDetailPage> {
                               child: SizedBox(
                                 height: 500,
                                 child: InteractiveChart(
-                                  candles: candleData,
+                                  candles: candleData, // 최신 데이터 전달
                                   style: ChartStyle(
                                     priceGainColor: Colors.green,
                                     priceLossColor: Colors.red,
                                     volumeColor: Colors.blue.withOpacity(0.5),
-                                    trendLineStyles: [
-                                      Paint()
-                                        ..strokeWidth = 2.0
-                                        ..strokeCap = StrokeCap.round
-                                        ..color = Colors.orange,
-                                    ],
                                     selectionHighlightColor:
                                         Colors.blue.withOpacity(0.2),
                                     overlayBackgroundColor:
@@ -165,8 +204,7 @@ class _StockDetailPageState extends State<StockDetailPage> {
                                     "Low": "${candle.low?.toStringAsFixed(2)}",
                                     "Close":
                                         "${candle.close?.toStringAsFixed(2)}",
-                                    "Volume":
-                                        "${candle.volume?.toStringAsFixed(2)}",
+                                    "Volume": "${candle.volume}",
                                   },
                                 ),
                               ),

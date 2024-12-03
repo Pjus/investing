@@ -26,13 +26,10 @@ class LoginPage extends StatelessWidget {
       if (response.statusCode == 200) {
         // 로그인 성공
         final data = json.decode(response.body);
-        SharedPreferences prefs = await SharedPreferences.getInstance();
-        await prefs.setString('accessToken', data['access']);
-        await prefs.setString('refreshToken', data['refresh']);
+        final token = data['access']; // 토큰 추출
 
-        // AuthProvider 상태 업데이트
-        final authProvider = Provider.of<AuthProvider>(context, listen: false);
-        authProvider.logIn();
+        // AuthProvider에 토큰 저장
+        Provider.of<AuthProvider>(context, listen: false).logIn(token);
 
         Navigator.pop(context); // 로그인 후 메인 화면으로 복귀
       } else {

@@ -4,6 +4,7 @@ import 'package:stock_app/screens/main_screen.dart';
 import 'package:stock_app/screens/login_page.dart';
 import 'package:stock_app/screens/signup_page.dart';
 import 'package:stock_app/screens/utils/auth_provider.dart';
+import 'package:stock_app/screens/utils/dark_mode_provider.dart';
 
 void main() {
   runApp(
@@ -11,6 +12,9 @@ void main() {
       providers: [
         ChangeNotifierProvider(
             create: (_) => AuthProvider()..checkLoginStatus()),
+        ChangeNotifierProvider(
+          create: (_) => DarkModeProvider(), // 다크 모드 관리 Provider 추가
+        ),
       ],
       child: MyApp(),
     ),
@@ -20,9 +24,15 @@ void main() {
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
+    final darkModeProvider = Provider.of<DarkModeProvider>(context);
+
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       title: 'Flutter App',
-      theme: ThemeData.dark(),
+      theme: ThemeData(
+        brightness:
+            darkModeProvider.isDarkMode ? Brightness.dark : Brightness.light,
+      ),
       home: MainScreen(),
       routes: {
         '/login': (context) => LoginPage(), // 로그인 페이지
