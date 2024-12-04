@@ -2,6 +2,18 @@ from django.contrib.auth.models import User
 from django.db import models
 
 
+class Stock(models.Model):
+    symbol = models.CharField(max_length=10, unique=True)  # 종목 코드
+    name = models.CharField(max_length=255)  # 회사 이름
+    market_cap = models.BigIntegerField(null=True, blank=True)  # 시가 총액
+    price = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)  # 현재 가격
+    change = models.DecimalField(max_digits=6, decimal_places=2, null=True, blank=True)  # 가격 변동
+    revenue = models.BigIntegerField(null=True, blank=True)  # 매출
+    last_updated = models.DateTimeField(auto_now=True)  # 마지막 업데이트 시간
+
+    def __str__(self):
+        return f"{self.symbol} - {self.name}"
+
 class Watchlist(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     stock_symbol = models.CharField(max_length=10)  # 종목 코드
@@ -9,23 +21,6 @@ class Watchlist(models.Model):
 
     def __str__(self):
         return f"{self.user.username} - {self.stock_symbol}"
-
-
-class Stock(models.Model):
-    ticker = models.CharField(max_length=10, unique=True)  # 주식 티커
-    name = models.CharField(max_length=100)               # 회사 이름
-    last_price = models.FloatField(blank=True)  # 마지막 가격 (옵션)
-    net_change = models.FloatField(blank=True)  # 순 변동
-    pct_change = models.FloatField(blank=True)  # 퍼센트 변동
-    marketcap = models.IntegerField(blank=True)  # 시가총액
-    country = models.CharField(max_length=50, null=True, blank=True)  # 국가
-    ipo_year = models.IntegerField(blank=True)  # 등록년도
-    volume = models.IntegerField(blank=True)  # 거래량
-    sector = models.CharField(max_length=100, blank=True, null=True)  # 섹터
-    industry = models.CharField(max_length=100, blank=True, null=True)  # 산업군
-
-    def __str__(self):
-        return f"{self.ticker} - {self.name}"
 
 
 class Favorite(models.Model):

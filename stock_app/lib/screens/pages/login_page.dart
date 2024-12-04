@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:provider/provider.dart';
-import 'utils/auth_provider.dart';
+import '../utils/auth_provider.dart';
 
 class LoginPage extends StatelessWidget {
   final TextEditingController _usernameController = TextEditingController();
@@ -27,9 +26,9 @@ class LoginPage extends StatelessWidget {
         // 로그인 성공
         final data = json.decode(response.body);
         final token = data['access']; // 토큰 추출
-
+        final role = data['role'];
         // AuthProvider에 토큰 저장
-        Provider.of<AuthProvider>(context, listen: false).logIn(token);
+        Provider.of<AuthProvider>(context, listen: false).logIn(token, role);
 
         Navigator.pop(context); // 로그인 후 메인 화면으로 복귀
       } else {

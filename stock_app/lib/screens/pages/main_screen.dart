@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'index_page.dart'; // Index 페이지
-import 'chart_page.dart'; // Chart 페이지
 import 'favoriate_page.dart';
+import 'admin_page.dart'; // Index 페이지
 import 'portfolio_page.dart'; // Portfolio 페이지
 import 'setting_page.dart'; // Settings 페이지
 import 'notification_page.dart'; // 알림 페이지
-import 'account_page.dart'; // 계정 페이지
-import 'utils/auth_provider.dart'; // AuthProvider
+import '../utils/auth_provider.dart'; // AuthProvider
 import 'package:provider/provider.dart';
 
 class MainScreen extends StatefulWidget {
@@ -24,6 +23,7 @@ class _MainScreenState extends State<MainScreen> {
     FavoritesPage(), // Charts 페이지
     PortfolioPage(), // Portfolio 페이지
     SettingsPage(), // Settings 페이지
+    AdminPage(),
   ];
 
   void _onTabTapped(int index) {
@@ -125,23 +125,28 @@ class _MainScreenState extends State<MainScreen> {
         unselectedItemColor: Colors.grey,
         currentIndex: _selectedIndex,
         onTap: _onTabTapped,
-        items: const [
-          BottomNavigationBarItem(
+        items: [
+          const BottomNavigationBarItem(
             icon: Icon(Icons.home),
             label: 'Index',
           ),
-          BottomNavigationBarItem(
+          const BottomNavigationBarItem(
             icon: Icon(Icons.show_chart),
             label: 'Favorites',
           ),
-          BottomNavigationBarItem(
+          const BottomNavigationBarItem(
             icon: Icon(Icons.account_balance_wallet),
             label: 'Portfolio',
           ),
-          BottomNavigationBarItem(
+          const BottomNavigationBarItem(
             icon: Icon(Icons.settings),
             label: 'Settings',
           ),
+          if (authProvider.isAdmin) // 관리자 권한 확인
+            const BottomNavigationBarItem(
+              icon: Icon(Icons.admin_panel_settings),
+              label: 'Admin',
+            ),
         ],
       ),
     );

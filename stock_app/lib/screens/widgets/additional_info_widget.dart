@@ -23,7 +23,7 @@ class AdditionalInfoWidget extends StatelessWidget {
             '${formatNumber(stockData['fiftyTwoWeekLow'])} - ${formatNumber(stockData['fiftyTwoWeekHigh'])}'),
         _buildInfoTile(
             'Market Cap', '\$${formatNumber(stockData['marketCap'])}'),
-        _buildInfoTile('Volume', formatNumber(stockData['volume'])),
+        _buildInfoTile('Foward EPS', formatNumber(stockData['forwardEps'])),
         _buildInfoTile('Dividend Yield', '${stockData['dividendYield']}%'),
         _buildInfoTile('Beta', '${stockData['beta']}'),
       ],

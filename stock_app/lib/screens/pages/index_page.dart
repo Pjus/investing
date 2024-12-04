@@ -3,8 +3,8 @@ import 'package:provider/provider.dart';
 import 'stock_detail_page.dart';
 import 'market_index_page.dart';
 import 'news_page.dart';
-import 'utils/auth_provider.dart'; // AuthProvider import
-import 'utils/utils.dart'; // AuthProvider import
+import '../utils/auth_provider.dart'; // AuthProvider import
+import '../utils/utils.dart'; // AuthProvider import
 
 // Index 페이지
 class IndexPage extends StatelessWidget {

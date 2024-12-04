@@ -1,5 +1,7 @@
 import yfinance as yf
-
+import requests
+from django.conf import settings
+from .models import Stock
 
 def get_stock_data(symbol, period="1y", interval="1d"):
     try:
@@ -63,3 +65,56 @@ def get_stock_data(symbol, period="1y", interval="1d"):
         }
     except Exception as e:
         return {"status": "error", "message": str(e)}
+
+
+
+
+
+def fetch_stocks_data():
+    page_num = 0
+    header = {
+        'User-Agent' : 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/131.0.0.0 Safari/537.36'
+    }
+    try:
+        while page_num < 4:
+            page_num += 1
+            url = f"https://api.stockanalysis.com/api/screener/s/f?m=marketCap&s=desc&c=no,s,n,marketCap,price,change,revenue&cn=1000&f=exchange-is-NASDAQ&p={page_num}&i=stocks"
+            response = requests.get(url, timeout=10, headers=header)  # 10초 제한
+            response.raise_for_status()
+            data = response.json()  # JSON 데이터 파싱
+            return data.get('data', [])  # 'data' 키에 주식 정보가 저장됨
+    except requests.RequestException as e:
+        print(f"Error fetching stock data: {e}")
+        return []
+
+
+def save_stocks_to_db():
+    stocks_data = fetch_stocks_data()
+
+    if not stocks_data:
+        print("No data fetched from the API.")
+        return
+
+    for stock in stocks_data:
+        try:
+            # 데이터 매핑
+            symbol = stock.get('s')
+            name = stock.get('n')
+            market_cap = stock.get('marketCap')
+            price = stock.get('price')
+            change = stock.get('change')
+            revenue = stock.get('revenue')
+
+            # 데이터 저장 또는 업데이트
+            Stock.objects.update_or_create(
+                symbol=symbol,
+                defaults={
+                    'name': name,
+                    'market_cap': market_cap,
+                    'price': price,
+                    'change': change,
+                    'revenue': revenue,
+                },
+            )
+        except Exception as e:
+            print(f"Error saving stock {stock.get('s')}: {e}")

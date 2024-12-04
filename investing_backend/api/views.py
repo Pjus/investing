@@ -2,12 +2,13 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import status, permissions, viewsets, status
+
 import pandas as pd
 import yfinance as yf
 from finvizfinance.news import News
 
 from .utils import get_stock_data
-from .models import Favorite, Portfolio, Watchlist
+from .models import Favorite, Portfolio, Watchlist, Stock
 from .serializers import PortfolioSerializer, FavoriteSerializer, WatchlistSerializer, StockDetailSerializer
 
 
@@ -150,3 +151,6 @@ class PortfolioDetailView(APIView):
             return Response(status=204)
         except Portfolio.DoesNotExist:
             return Response({"error": "Stock not found"}, status=404)
+
+
+

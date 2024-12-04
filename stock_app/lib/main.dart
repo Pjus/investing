@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:stock_app/screens/main_screen.dart';
-import 'package:stock_app/screens/login_page.dart';
-import 'package:stock_app/screens/signup_page.dart';
+import 'package:stock_app/screens/pages/main_screen.dart';
+import 'package:stock_app/screens/pages/login_page.dart';
+import 'package:stock_app/screens/pages/signup_page.dart';
 import 'package:stock_app/screens/utils/auth_provider.dart';
 import 'package:stock_app/screens/utils/dark_mode_provider.dart';
 
