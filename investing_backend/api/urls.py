@@ -15,5 +15,4 @@ urlpatterns += [
     path('portfolio/', PortfolioListView.as_view(), name='portfolio_list'),
     path('portfolio/<str:ticker>/',
          PortfolioDetailView.as_view(), name='portfolio_detail'),
-    
 ]

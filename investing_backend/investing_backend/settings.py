@@ -61,7 +61,6 @@ INSTALLED_APPS = [
     'api',  # 새로 만든 앱 추가
     'corsheaders',
     'accounts',
-    'django_celery_beat',
 ]
 
 
@@ -146,7 +145,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = "en-us"
 
-TIME_ZONE = "UTC"
+TIME_ZONE = 'Asia/Seoul'
 
 USE_I18N = True
 
@@ -161,14 +160,4 @@ STATIC_URL = "static/"
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
-
-DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
-
-
-CELERY_TASK_SERIALIZER='json',
-CELERY_ACCEPT_CONTENT=['json'],
-CELERY_RESULT_SERIALIZER='json',
-
-CELERY_TIMEZONE='Asia/Seoul',
-CELERY_ENABLE_UTC=False,
-CELERY_BEAT_SCHEDULER='django_celery_beat.schedulers:DatabaseScheduler',
+DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

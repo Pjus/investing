@@ -7,3 +7,5 @@ class StockAdmin(admin.ModelAdmin):
     search_fields = ('symbol', 'name')
 
     
+
+

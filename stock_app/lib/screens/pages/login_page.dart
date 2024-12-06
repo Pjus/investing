@@ -63,7 +63,7 @@ class LoginPage extends StatelessWidget {
                 labelText: 'Username',
                 border: OutlineInputBorder(),
               ),
-              onSubmitted: (_) => _login(context), // 엔터 키 입력 시 로그인
+              onSubmitted: (_) => _login(context),
             ),
             const SizedBox(height: 16),
             TextField(
@@ -73,7 +73,7 @@ class LoginPage extends StatelessWidget {
                 border: OutlineInputBorder(),
               ),
               obscureText: true,
-              onSubmitted: (_) => _login(context), // 엔터 키 입력 시 로그인
+              onSubmitted: (_) => _login(context),
             ),
             const SizedBox(height: 20),
             ElevatedButton(

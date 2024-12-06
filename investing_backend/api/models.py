@@ -24,6 +24,7 @@ class Watchlist(models.Model):
 
 
 class Favorite(models.Model):
+    id = models.BigAutoField(primary_key=True)  # 기본 키 유형 명시
     user = models.ForeignKey(
         User, on_delete=models.CASCADE, related_name="favorites")
     ticker = models.CharField(max_length=10)  # 주식 티커
