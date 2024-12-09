@@ -58,6 +58,24 @@ class _MarketIndexCardState extends State<MarketIndexCard> {
 
   @override
   Widget build(BuildContext context) {
+    final changeNet = indexData?['change_net'] as num? ?? 0;
+    final changePercent = indexData?['change_percent'] as num? ?? 0;
+    final lastClose = indexData?['last_close'] ?? 'N/A';
+
+    // 조건에 따른 색상과 화살표 결정
+    Color textColor;
+    IconData? arrowIcon;
+    if (changeNet > 0) {
+      textColor = Colors.red;
+      arrowIcon = Icons.arrow_upward;
+    } else if (changeNet < 0) {
+      textColor = Colors.blue;
+      arrowIcon = Icons.arrow_downward;
+    } else {
+      textColor = Colors.grey;
+      arrowIcon = null;
+    }
+
     return Card(
       color: Colors.grey[850],
       child: ListTile(
@@ -68,8 +86,8 @@ class _MarketIndexCardState extends State<MarketIndexCard> {
                 style: TextStyle(color: Colors.white),
               )
             : Text(
-                '${widget.title}: ${indexData?['last_close']} (${indexData?['change_percent']}%)',
-                style: TextStyle(color: Colors.white),
+                '$lastClose ${changeNet.toStringAsFixed(2)} (${changePercent.toStringAsFixed(2)}%)',
+                style: TextStyle(color: textColor),
               ),
         subtitle: isLoading
             ? null

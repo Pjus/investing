@@ -10,14 +10,6 @@ class AdditionalInfoWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-        // 날짜 변환 함수
-    String formatTimestamp(dynamic timestamp) {
-      if (timestamp == null) return 'N/A';
-      // timestamp가 초 단위 Unix time이라고 가정
-      DateTime date = DateTime.fromMillisecondsSinceEpoch(timestamp * 1000, isUtc: true);
-      return DateFormat('yyyy-MM-dd').format(date);
-    }
-
 
     final overviewInfo = [
       _InfoItem(
@@ -58,39 +50,39 @@ class AdditionalInfoWidget extends StatelessWidget {
       _InfoItem(title: 'Dividend Rate', value: formatNumber(stockData['dividendRate'])),
       _InfoItem(
           title: 'Ex-Dividend Date',
-          value: formatTimestamp(stockData['exDividendDate']).toString() ?? 'N/A'),
+          value: stockData['exDividendDate'].toString()),
       _InfoItem(
           title: 'Last Dividend Value',
           value: formatNumber(stockData['lastDividendValue'])),
       _InfoItem(
           title: 'Last Dividend Date',
-          value: formatTimestamp(stockData['lastDividendDate']).toString() ?? 'N/A'),
+          value: stockData['lastDividendDate'].toString()),
     ];
 
-    // final growthInfo = [
-    //   _InfoItem(
-    //       title: 'Earnings Growth',
-    //       value: '${(stockData['earningsGrowth'] * 100).toStringAsFixed(2)}%'),
-    //   _InfoItem(
-    //       title: 'Revenue Growth',
-    //       value: '${(stockData['revenueGrowth'] * 100).toStringAsFixed(2)}%'),
-    //   _InfoItem(
-    //       title: 'Earnings Quarterly Growth',
-    //       value:
-    //           '${(stockData['earningsQuarterlyGrowth'] * 100).toStringAsFixed(2)}%'),
-    //   _InfoItem(
-    //       title: '52 Week Change',
-    //       value: '${(stockData['52WeekChange'] * 100).toStringAsFixed(2)}%'),
-    //   _InfoItem(
-    //       title: 'Target Mean Price',
-    //       value: '\$${formatNumber(stockData['targetMeanPrice'])}'),
-    //   _InfoItem(
-    //       title: 'Target High Price',
-    //       value: '\$${formatNumber(stockData['targetHighPrice'])}'),
-    //   _InfoItem(
-    //       title: 'Target Low Price',
-    //       value: '\$${formatNumber(stockData['targetLowPrice'])}'),
-    // ];
+    final growthInfo = [
+      _InfoItem(
+          title: 'Earnings Growth',
+          value: '${(stockData['earningsGrowth'] * 100).toStringAsFixed(2)}%'),
+      _InfoItem(
+          title: 'Revenue Growth',
+          value: '${(stockData['revenueGrowth'] * 100).toStringAsFixed(2)}%'),
+      _InfoItem(
+          title: 'Earnings Quarterly Growth',
+          value:
+              '${(stockData['earningsQuarterlyGrowth'] * 100).toStringAsFixed(2)}%'),
+      _InfoItem(
+          title: '52 Week Change',
+          value: '${(stockData['fiftyTwoWeekChange'] * 100).toStringAsFixed(2)}%'),
+      _InfoItem(
+          title: 'Target Mean Price',
+          value: '\$${formatNumber(stockData['targetMeanPrice'])}'),
+      _InfoItem(
+          title: 'Target High Price',
+          value: '\$${formatNumber(stockData['targetHighPrice'])}'),
+      _InfoItem(
+          title: 'Target Low Price',
+          value: '\$${formatNumber(stockData['targetLowPrice'])}'),
+    ];
 
     return DefaultTabController(
       length: 5,
@@ -116,7 +108,7 @@ class AdditionalInfoWidget extends StatelessWidget {
                 _buildInfoGrid(valuationInfo),
                 _buildInfoGrid(financialsInfo),
                 _buildInfoGrid(dividendsInfo),
-                // _buildInfoGrid(growthInfo),
+                _buildInfoGrid(growthInfo),
               ],
             ),
           ),

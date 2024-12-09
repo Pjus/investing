@@ -50,13 +50,15 @@ class SP500APIView(APIView):
             # 필요한 정보 추출
             last_close = info['Close'].iloc[-1]
             open_price = info['Open'].iloc[-1]
-            change = (last_close - open_price) / open_price * 100
+            change = last_close - open_price
+            pct_change = (last_close - open_price) / open_price * 100
             day_range = f"{stock.info['dayLow']} - {stock.info['dayHigh']}"
 
             result = {
                 "symbol": ticker,
                 "last_close": round(last_close, 2),
-                "change_percent": round(change, 2),
+                "change_net": round(change, 2),
+                "change_percent": round(pct_change, 2),
                 "day_range": day_range,
             }
 

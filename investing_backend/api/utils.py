@@ -1,5 +1,17 @@
 import yfinance as yf
 import requests
+from datetime import datetime, timezone
+
+def convert_unix_to_date(data, keys):
+    for key in keys:
+        if key in data and data[key] is not None:
+            try:
+                data[key] = datetime.fromtimestamp(int(data[key]), tz=timezone.utc).strftime('%Y-%m-%d')
+            except ValueError:
+                pass  # 유효하지 않은 값 처리
+    return data
+
+
 
 def get_stock_data(symbol, period="1y", interval="1d"):
     try:
@@ -52,15 +64,20 @@ def get_stock_data(symbol, period="1y", interval="1d"):
 
         # 데이터 변환
         result = historical_data.to_dict(orient="records")
-
-        return {
+        # 변환 대상 키
+        date_keys = ["exDividendDate", "lastDividendDate"]
+        stock_details = convert_unix_to_date(stock_details, date_keys)
+        return_values = {
             "status": "success",
             "symbol": symbol,
             "period": period,
             "interval": interval,
             "data": result,  # 과거 주가 데이터
-            **stock_details,  # 선택된 키의 종목 상세 정보
+            "fiftyTwoWeekChange": stock_details.get("52WeekChange"),  # 명시적으로 추가
+            **{k: v for k, v in stock_details.items() if k != "52WeekChange" },  # 나머지 데이터
         }
+        return return_values
+    
     except Exception as e:
         return {"status": "error", "message": str(e)}
 

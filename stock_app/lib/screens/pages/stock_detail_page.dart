@@ -7,6 +7,7 @@ import 'package:stock_app/screens/widgets/additional_info_widget.dart';
 import 'package:stock_app/screens/widgets/stock_info_widget.dart';
 import 'package:provider/provider.dart';
 import 'package:stock_app/screens/utils/dark_mode_provider.dart';
+import 'package:stock_app/screens/widgets/chart_time_range.dart';
 
 class StockDetailPage extends StatefulWidget {
   final String symbol;
@@ -160,10 +161,12 @@ class _StockDetailPageState extends State<StockDetailPage> {
                         children: [
                           StockInfoWidget(stockData: stockData!),
                           const SizedBox(height: 20),
-                          const Text(
-                            'Candlestick Chart',
-                            style: TextStyle(
-                                fontSize: 18, fontWeight: FontWeight.bold),
+                          ChartTimeRangeWidget(
+                            candleData: candleData,
+                            onRangeSelected: (range) {
+                              print("Selected Range: $range");
+                              // API 호출 로직 추가 가능
+                            },
                           ),
                           const SizedBox(height: 10),
                           MouseRegion(

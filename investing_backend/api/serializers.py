@@ -76,7 +76,7 @@ class StockDetailSerializer(serializers.Serializer):
     forwardEps = serializers.FloatField(required=False, allow_null=True)
     earningsQuarterlyGrowth = serializers.FloatField(
         required=False, allow_null=True)
-    _52WeekChange = serializers.FloatField(required=False, allow_null=True)
+    fiftyTwoWeekChange = serializers.FloatField(required=False, allow_null=True)
 
     # 기타
     financialCurrency = serializers.CharField(required=False, allow_null=True)
