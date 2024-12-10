@@ -19,16 +19,14 @@ class _ChartTimeRangeWidgetState extends State<ChartTimeRangeWidget> {
   String selectedRange = "1 Day";
 
   final List<String> timeRanges = [
-    final periodMapping = {
-      "1 Day": "1d",
-      "5 Days": "5d",
-      "1 Month": "1mo",
-      "6 Month": "6mo",
-      "1 Year": "1y",
-      "5 Years": "5y",
-      "10 Years": "10y",
-      "Max": "max"
-    };
+    "1 Day",
+    "5 Days",
+    "1 Month",
+    "6 Month",
+    "1 Year",
+    "5 Years",
+    "10 Years",
+    "Max"
   ];
 
   @override

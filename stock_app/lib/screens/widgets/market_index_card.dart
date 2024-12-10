@@ -61,6 +61,7 @@ class _MarketIndexCardState extends State<MarketIndexCard> {
     final changeNet = indexData?['change_net'] as num? ?? 0;
     final changePercent = indexData?['change_percent'] as num? ?? 0;
     final lastClose = indexData?['last_close'] ?? 'N/A';
+    final title = widget.title;
 
     // 조건에 따른 색상과 화살표 결정
     Color textColor;
@@ -86,7 +87,7 @@ class _MarketIndexCardState extends State<MarketIndexCard> {
                 style: TextStyle(color: Colors.white),
               )
             : Text(
-                '$lastClose ${changeNet.toStringAsFixed(2)} (${changePercent.toStringAsFixed(2)}%)',
+                '$title $lastClose ${changeNet.toStringAsFixed(2)} (${changePercent.toStringAsFixed(2)}%)',
                 style: TextStyle(color: textColor),
               ),
         subtitle: isLoading

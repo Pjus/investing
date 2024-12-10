@@ -37,12 +37,3 @@ class Favorite(models.Model):
     def __str__(self):
         return f"{self.user.username} - {self.ticker}"
 
-
-class Portfolio(models.Model):
-    user = models.ForeignKey(
-        User, on_delete=models.CASCADE, related_name='portfolio')
-    ticker = models.CharField(max_length=10)
-    shares = models.FloatField()
-
-    def __str__(self):
-        return f"{self.ticker} - {self.shares} shares"

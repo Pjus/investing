@@ -10,8 +10,9 @@ class PortfolioPage extends StatefulWidget {
 }
 
 class _PortfolioPageState extends State<PortfolioPage> {
-  List<Map<String, dynamic>> portfolioStocks = []; // 포트폴리오 주식 목록
+  List<Map<String, dynamic>> portfolioStocks = [];
   bool isLoading = true;
+  bool hasError = false;
 
   @override
   void initState() {
@@ -20,6 +21,11 @@ class _PortfolioPageState extends State<PortfolioPage> {
   }
 
   Future<void> fetchPortfolioStocks() async {
+    setState(() {
+      isLoading = true;
+      hasError = false;
+    });
+
     final authProvider = Provider.of<AuthProvider>(context, listen: false);
 
     if (!authProvider.isLoggedIn) {
@@ -47,10 +53,8 @@ class _PortfolioPageState extends State<PortfolioPage> {
     } catch (e) {
       setState(() {
         isLoading = false;
+        hasError = true;
       });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to load portfolio: $e')),
-      );
     }
   }
 
@@ -75,7 +79,7 @@ class _PortfolioPageState extends State<PortfolioPage> {
       );
 
       if (response.statusCode == 201) {
-        fetchPortfolioStocks(); // 포트폴리오 업데이트
+        fetchPortfolioStocks();
       } else {
         throw Exception('Failed to add stock to portfolio');
       }
@@ -84,6 +88,82 @@ class _PortfolioPageState extends State<PortfolioPage> {
         SnackBar(content: Text('Failed to add stock: $e')),
       );
     }
+  }
+
+  Widget buildEmptyPortfolioView() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(Icons.inventory, size: 80, color: Colors.grey),
+          const SizedBox(height: 16),
+          const Text(
+            'Your portfolio is empty.',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 8),
+          const Text(
+            'Add stocks to your portfolio to get started.',
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 16),
+          ),
+          const SizedBox(height: 16),
+          ElevatedButton(
+            onPressed: () async {
+              // Example: Adding a stock directly for demonstration
+              await addStockToPortfolio('AAPL', 10);
+            },
+            child: const Text('Add AAPL 10 Shares'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget buildErrorView() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          const Icon(Icons.error, size: 80, color: Colors.red),
+          const SizedBox(height: 16),
+          const Text(
+            'Failed to load portfolio.',
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+          ),
+          const SizedBox(height: 8),
+          const Text(
+            'Please check your internet connection or try again.',
+            textAlign: TextAlign.center,
+            style: TextStyle(fontSize: 16),
+          ),
+          const SizedBox(height: 16),
+          ElevatedButton(
+            onPressed: fetchPortfolioStocks,
+            child: const Text('Retry'),
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget buildPortfolioList() {
+    return ListView.builder(
+      itemCount: portfolioStocks.length,
+      itemBuilder: (context, index) {
+        final stock = portfolioStocks[index];
+        return Card(
+          child: ListTile(
+            title: Text(stock['ticker']),
+            subtitle: Text('Shares: ${stock['shares']}'),
+            trailing: IconButton(
+              icon: const Icon(Icons.remove_circle),
+              onPressed: () => removeStockFromPortfolio(stock['ticker']),
+            ),
+          ),
+        );
+      },
+    );
   }
 
   Future<void> removeStockFromPortfolio(String ticker) async {
@@ -96,7 +176,7 @@ class _PortfolioPageState extends State<PortfolioPage> {
       );
 
       if (response.statusCode == 204) {
-        fetchPortfolioStocks(); // 포트폴리오 업데이트
+        fetchPortfolioStocks();
       } else {
         throw Exception('Failed to remove stock from portfolio');
       }
@@ -136,41 +216,12 @@ class _PortfolioPageState extends State<PortfolioPage> {
         backgroundColor: Colors.grey[900],
       ),
       body: isLoading
-          ? const Center(
-              child: CircularProgressIndicator(),
-            )
-          : Column(
-              children: [
-                Expanded(
-                  child: ListView.builder(
-                    itemCount: portfolioStocks.length,
-                    itemBuilder: (context, index) {
-                      final stock = portfolioStocks[index];
-                      return Card(
-                        child: ListTile(
-                          title: Text(stock['ticker']),
-                          subtitle: Text('Shares: ${stock['shares']}'),
-                          trailing: IconButton(
-                            icon: const Icon(Icons.remove_circle),
-                            onPressed: () =>
-                                removeStockFromPortfolio(stock['ticker']),
-                          ),
-                          onTap: () {
-                            // 주식 상세 페이지로 이동
-                          },
-                        ),
-                      );
-                    },
-                  ),
-                ),
-                ElevatedButton(
-                  onPressed: () async {
-                    await addStockToPortfolio('AAPL', 10);
-                  },
-                  child: const Text('Add AAPL 10 Shares'),
-                ),
-              ],
-            ),
+          ? const Center(child: CircularProgressIndicator())
+          : hasError
+              ? buildErrorView()
+              : portfolioStocks.isEmpty
+                  ? buildEmptyPortfolioView()
+                  : buildPortfolioList(),
     );
   }
 }

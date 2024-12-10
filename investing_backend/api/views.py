@@ -1,6 +1,5 @@
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
 from rest_framework import status, permissions, viewsets, status
 
 import pandas as pd
@@ -8,8 +7,8 @@ import yfinance as yf
 from finvizfinance.news import News
 
 from .utils import get_stock_data
-from .models import Favorite, Portfolio, Watchlist, Stock
-from .serializers import PortfolioSerializer, FavoriteSerializer, WatchlistSerializer, StockDetailSerializer
+from .models import Favorite, Watchlist, Stock
+from .serializers import FavoriteSerializer, WatchlistSerializer, StockDetailSerializer
 
 
 class WatchlistViewSet(viewsets.ModelViewSet):
@@ -123,36 +122,5 @@ class FavoriteAPIView(APIView):
             favorite.delete()
             return Response({"status": "success", "message": "Favorite deleted"}, status=status.HTTP_200_OK)
         return Response({"status": "error", "message": "Favorite not found"}, status=status.HTTP_404_NOT_FOUND)
-
-
-class PortfolioListView(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def get(self, request):
-        portfolio = Portfolio.objects.filter(user=request.user)
-        serializer = PortfolioSerializer(portfolio, many=True)
-        return Response({"data": serializer.data})
-
-    def post(self, request):
-        data = request.data
-        data['user'] = request.user.id
-        serializer = PortfolioSerializer(data=data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=201)
-        return Response(serializer.errors, status=400)
-
-
-class PortfolioDetailView(APIView):
-    permission_classes = [IsAuthenticated]
-
-    def delete(self, request, ticker):
-        try:
-            stock = Portfolio.objects.get(user=request.user, ticker=ticker)
-            stock.delete()
-            return Response(status=204)
-        except Portfolio.DoesNotExist:
-            return Response({"error": "Stock not found"}, status=404)
-
 
 

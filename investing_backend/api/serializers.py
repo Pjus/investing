@@ -1,4 +1,4 @@
-from .models import Portfolio, Watchlist, Favorite
+from .models import Watchlist, Favorite
 from rest_framework import serializers
 
 
@@ -95,7 +95,3 @@ class FavoriteSerializer(serializers.ModelSerializer):
         return data
 
 
-class PortfolioSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Portfolio
-        fields = ['id', 'ticker', 'shares']
