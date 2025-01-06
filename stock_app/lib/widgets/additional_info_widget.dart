@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:stock_app/screens/utils/utils.dart';
+import 'package:stock_app/utils/utils.dart';
 import 'package:intl/intl.dart';
 
 class AdditionalInfoWidget extends StatelessWidget {

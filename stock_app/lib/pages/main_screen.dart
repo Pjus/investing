@@ -5,7 +5,7 @@ import 'admin_page.dart'; // Index 페이지
 import 'portfolio_page.dart'; // Portfolio 페이지
 import 'setting_page.dart'; // Settings 페이지
 import 'notification_page.dart'; // 알림 페이지
-import '../utils/auth_provider.dart'; // AuthProvider
+import '../providers/auth_provider.dart'; // AuthProvider
 import 'package:provider/provider.dart';
 
 class MainScreen extends StatefulWidget {
@@ -128,11 +128,11 @@ class _MainScreenState extends State<MainScreen> {
         items: [
           const BottomNavigationBarItem(
             icon: Icon(Icons.home),
-            label: 'Index',
+            label: 'Home',
           ),
           const BottomNavigationBarItem(
             icon: Icon(Icons.show_chart),
-            label: 'Favorites',
+            label: 'Stocks',
           ),
           const BottomNavigationBarItem(
             icon: Icon(Icons.account_balance_wallet),

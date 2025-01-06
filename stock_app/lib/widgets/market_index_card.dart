@@ -62,7 +62,7 @@ class _MarketIndexCardState extends State<MarketIndexCard> {
     final changePercent = indexData?['change_percent'] as num? ?? 0;
     final lastClose = indexData?['last_close'] ?? 'N/A';
     final title = widget.title;
-
+    var upNdown = '';
     // 조건에 따른 색상과 화살표 결정
     Color textColor;
     IconData? arrowIcon;
@@ -77,6 +77,13 @@ class _MarketIndexCardState extends State<MarketIndexCard> {
       arrowIcon = null;
     }
 
+    if (changeNet == 0) {
+      upNdown = '';
+    } else {
+      upNdown = changeNet > 0 ? '▲' : '▼';
+    }
+    ;
+
     return Card(
       color: Colors.grey[850],
       child: ListTile(
@@ -86,14 +93,22 @@ class _MarketIndexCardState extends State<MarketIndexCard> {
                 'Loading...',
                 style: TextStyle(color: Colors.white),
               )
-            : Text(
-                '$title $lastClose ${changeNet.toStringAsFixed(2)} (${changePercent.toStringAsFixed(2)}%)',
-                style: TextStyle(color: textColor),
+            : Row(
+                children: [
+                  Text(
+                    '$title : $lastClose',
+                    style: TextStyle(color: textColor),
+                  ),
+                  Text(
+                    ' $upNdown $changeNet ($changePercent%)',
+                    style: TextStyle(color: textColor),
+                  )
+                ],
               ),
         subtitle: isLoading
             ? null
             : Text(
-                'Day Range: ${indexData?['day_range']}',
+                'Day Range: ${indexData?['day_range'][0]} - ${indexData?['day_range'][1]}',
                 style: TextStyle(color: Colors.grey),
               ),
         trailing: const Icon(Icons.chevron_right, color: Colors.white),

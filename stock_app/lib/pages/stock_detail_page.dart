@@ -3,11 +3,11 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'package:interactive_chart/interactive_chart.dart';
 import 'dart:convert';
-import 'package:stock_app/screens/widgets/additional_info_widget.dart';
-import 'package:stock_app/screens/widgets/stock_info_widget.dart';
+import 'package:stock_app/widgets/additional_info_widget.dart';
+import 'package:stock_app/widgets/stock_info_widget.dart';
 import 'package:provider/provider.dart';
-import 'package:stock_app/screens/utils/dark_mode_provider.dart';
-import 'package:stock_app/screens/widgets/chart_time_range.dart';
+import 'package:stock_app/utils/dark_mode_provider.dart';
+import 'package:stock_app/widgets/chart_time_range.dart';
 
 class StockDetailPage extends StatefulWidget {
   final String symbol;

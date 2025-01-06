@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:stock_app/screens/utils/auth_provider.dart';
+import 'package:stock_app/providers/auth_provider.dart';
 
 class PortfolioPage extends StatefulWidget {
   @override

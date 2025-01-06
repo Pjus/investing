@@ -61,13 +61,19 @@ INSTALLED_APPS = [
     'api',  # 새로 만든 앱 추가
     'corsheaders',
     'accounts',
+    'favorite',
 ]
 
 
 REST_FRAMEWORK = {
-    'DEFAULT_AUTHENTICATION_CLASSES': (
-        'rest_framework_simplejwt.authentication.JWTAuthentication',
-    ),
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.TokenAuthentication',  # 필요하면 추가
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',  # 기본 권한 설정
+    ],
 }
 
 
