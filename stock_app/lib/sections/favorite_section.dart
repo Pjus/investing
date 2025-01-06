@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+import '../pages/favoriate_page.dart';
 
 import 'package:stock_app/utils/constants.dart';
 
@@ -14,6 +15,7 @@ class FavoritesSection extends StatefulWidget {
 class _FavoritesSectionState extends State<FavoritesSection> {
   List<Map<String, dynamic>> favorites = [];
   bool isLoading = true;
+  bool isAdding = false; // Add More 상태 관리
 
   @override
   void initState() {
@@ -51,6 +53,14 @@ class _FavoritesSectionState extends State<FavoritesSection> {
       return const Center(
         child: CircularProgressIndicator(),
       );
+    }
+
+    if (isAdding) {
+      return FavoritesPage(onBack: () {
+        setState(() {
+          isAdding = false; // Add More 화면에서 돌아오기
+        });
+      });
     }
 
     if (favorites.isEmpty) {
