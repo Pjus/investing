@@ -14,16 +14,25 @@ class FavoriteListCreateView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
+        # 로그인한 사용자의 즐겨찾기 항목 가져오기
         favorites = Favorite.objects.filter(user=request.user)
-        serializer = FavoriteSerializer(favorites, many=True)
-        return Response(serializer.data)
+
+        # 즐겨찾기 항목의 티커를 기반으로 주식 데이터를 가져오기
+        stock_tickers = favorites.values_list('ticker', flat=True)
+        stock_tickers = [ticker.upper() for ticker in stock_tickers]
+        stocks = Stock.objects.filter(ticker__in=stock_tickers)
+        stock_data = StockSerializer(stocks, many=True)
+
+        return Response(stock_data.data, status=status.HTTP_200_OK)
 
     def post(self, request):
 
         # Pass the request object explicitly to the serializer's context
         ticker = request.data.get('ticker').lower()
+
         serializer = FavoriteSerializer(
             data=request.data, context={'request': request})
+
         if serializer.is_valid():
             serializer.save(user=request.user)
             return Response(serializer.data, status=status.HTTP_201_CREATED)

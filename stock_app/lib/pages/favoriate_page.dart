@@ -109,7 +109,8 @@ class _FavoritesPageState extends State<FavoritesPage> {
                         }); // 즐겨찾기 여부 확인
                         return Card(
                           child: ListTile(
-                            title: Text(stock['ticker'] ?? 'Unknown'),
+                            title: Text(
+                                stock['ticker']?.toUpperCase() ?? 'Unknown'),
                             subtitle: Text("${stock['name']}".toUpperCase()),
                             trailing: IconButton(
                               icon: Icon(

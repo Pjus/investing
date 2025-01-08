@@ -6,8 +6,8 @@ import '../pages/favoriate_page.dart';
 import 'package:stock_app/utils/constants.dart';
 
 import 'package:provider/provider.dart';
-import 'package:stock_app/providers/favorites_provider.dart';
 import 'package:stock_app/providers/auth_provider.dart'; // AuthProvider 가져오기
+import 'package:stock_app/providers/favorites_provider.dart';
 
 class FavoritesSection extends StatefulWidget {
   const FavoritesSection({super.key});
@@ -24,68 +24,18 @@ class _FavoritesSectionState extends State<FavoritesSection> {
   @override
   void initState() {
     super.initState();
-    fetchFavorites();
-  }
-
-  Future<void> fetchFavorites() async {
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
-
-    if (!authProvider.isLoggedIn) {
-      setState(() {
-        isLoading = false;
-      });
-      return;
-    }
-
-    try {
-      final response = await http.get(
-        Uri.parse(APIConstants.favoriteEndpoint),
-        headers: {
-          'Authorization': 'Bearer ${authProvider.token}',
-        },
-      );
-
-      if (response.statusCode == 200) {
-        final List<dynamic> data = json.decode(response.body);
-        setState(() {
-          favorites = data.cast<Map<String, dynamic>>();
-          isLoading = false;
-        });
-      } else {
-        print("Failed to load favorites: ${response.statusCode}");
-        setState(() {
-          isLoading = false;
-        });
-      }
-    } catch (e) {
-      print("Error fetching favorites: $e");
-      setState(() {
-        isLoading = false;
-      });
-    }
+    final favoritesProvider =
+        Provider.of<FavoritesProvider>(context, listen: false);
+    favoritesProvider.fetchFavorites(context); // 전체 데이터를 초기화
   }
 
   @override
   Widget build(BuildContext context) {
     final favoritesProvider = Provider.of<FavoritesProvider>(context);
+
     if (favoritesProvider.isLoading) {
       return Center(
         child: CircularProgressIndicator(),
-      );
-    }
-    if (isLoading) {
-      return const Center(
-        child: CircularProgressIndicator(),
-      );
-    }
-
-    if (isAdding) {
-      return Navigator(
-        onGenerateRoute: (settings) {
-          return MaterialPageRoute(
-            builder: (context) => FavoritesPage(),
-          );
-        },
       );
     }
 
@@ -126,7 +76,7 @@ class _FavoritesSectionState extends State<FavoritesSection> {
         ...favoritesProvider.favorites.map((favorite) => Card(
               child: ListTile(
                 title: Text("${favorite['ticker']}".toUpperCase()),
-                subtitle: Text("Price: \$${favorite['current_price']}"),
+                subtitle: Text("Price: \$${favorite['price']}"),
                 trailing: IconButton(
                   icon: Icon(Icons.remove_circle),
                   onPressed: () {

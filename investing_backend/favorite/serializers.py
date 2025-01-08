@@ -5,8 +5,7 @@ from .models import Favorite
 class FavoriteSerializer(serializers.ModelSerializer):
     class Meta:
         model = Favorite
-        fields = ['id', 'user', 'ticker', 'name', 'current_price',
-                  'change', 'change_percent', 'created_at']
+        fields = ['id', 'user', 'ticker', 'name', 'created_at']
         read_only_fields = ['user', 'created_at']
 
     def validate(self, data):

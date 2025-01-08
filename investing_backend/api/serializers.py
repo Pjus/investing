@@ -5,10 +5,8 @@ from .models import Stock
 class StockSerializer(serializers.ModelSerializer):
     class Meta:
         model = Stock
-        fields = [
-            'ticker', 'name', 'market_cap', 'price', 'change',
-            'change_percent', 'revenue', 'last_updated'
-        ]
+        fields = ['ticker', 'name', 'price',
+                  'change', 'change_percent', 'market_cap']
 
 
 class StockHistoricalDataSerializer(serializers.Serializer):
