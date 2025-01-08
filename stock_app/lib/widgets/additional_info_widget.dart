@@ -10,12 +10,11 @@ class AdditionalInfoWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     final overviewInfo = [
       _InfoItem(
         title: '52-Week Low - High',
         value:
-            '${formatNumber(stockData['fiftyTwoWeekLow'])} - ${formatNumber(stockData['fiftyTwoWeekHigh'])}',
+            '${formatNumber(stockData['fiftyTwoWeekLow'] ?? 0)} - ${formatNumber(stockData['fiftyTwoWeekHigh'] ?? 0)}',
       ),
       _InfoItem(
         title: 'Market Cap',
@@ -23,31 +22,53 @@ class AdditionalInfoWidget extends StatelessWidget {
       ),
       _InfoItem(title: 'Beta', value: '${stockData['beta']}'),
       _InfoItem(
-          title: 'Previous Close', value: formatNumber(stockData['previousClose'])),
+          title: 'Previous Close',
+          value: formatNumber(stockData['previousClose'])),
     ];
 
     final valuationInfo = [
-      _InfoItem(title: 'Forward EPS', value: formatNumber(stockData['forwardEps'])),
-      _InfoItem(title: 'Trailing PE', value: formatNumber(stockData['trailingPE'])),
-      _InfoItem(title: 'Forward PE', value: formatNumber(stockData['forwardPE'])),
-      _InfoItem(title: 'Price To Book', value: formatNumber(stockData['priceToBook'])),
+      _InfoItem(
+          title: 'Forward EPS', value: formatNumber(stockData['forwardEps'])),
+      _InfoItem(
+          title: 'Trailing PE', value: formatNumber(stockData['trailingPE'])),
+      _InfoItem(
+          title: 'Forward PE', value: formatNumber(stockData['forwardPE'])),
+      _InfoItem(
+          title: 'Price To Book',
+          value: formatNumber(stockData['priceToBook'])),
     ];
 
     final financialsInfo = [
-      _InfoItem(title: 'Total Revenue', value: '\$${formatNumber(stockData['totalRevenue'])}'),
-      _InfoItem(title: 'Revenue/Share', value: formatNumber(stockData['revenuePerShare'])),
-      _InfoItem(title: 'EBITDA', value: '\$${formatNumber(stockData['ebitda'])}'),
-      _InfoItem(title: 'Operating Cashflow', value: '\$${formatNumber(stockData['operatingCashflow'])}'),
-      _InfoItem(title: 'Free Cashflow', value: '\$${formatNumber(stockData['freeCashflow'])}'),
-      _InfoItem(title: 'Total Debt', value: '\$${formatNumber(stockData['totalDebt'])}'),
-      _InfoItem(title: 'Debt To Equity', value: '${formatNumber(stockData['debtToEquity'])}%'),
+      _InfoItem(
+          title: 'Total Revenue',
+          value: '\$${formatNumber(stockData['totalRevenue'])}'),
+      _InfoItem(
+          title: 'Revenue/Share',
+          value: formatNumber(stockData['revenuePerShare'])),
+      _InfoItem(
+          title: 'EBITDA', value: '\$${formatNumber(stockData['ebitda'])}'),
+      _InfoItem(
+          title: 'Operating Cashflow',
+          value: '\$${formatNumber(stockData['operatingCashflow'])}'),
+      _InfoItem(
+          title: 'Free Cashflow',
+          value: '\$${formatNumber(stockData['freeCashflow'])}'),
+      _InfoItem(
+          title: 'Total Debt',
+          value: '\$${formatNumber(stockData['totalDebt'])}'),
+      _InfoItem(
+          title: 'Debt To Equity',
+          value: '${formatNumber(stockData['debtToEquity'])}%'),
     ];
 
     final dividendsInfo = [
       _InfoItem(
           title: 'Dividend Yield',
-          value: '${(stockData['dividendYield'] * 100).toStringAsFixed(2)}%'),
-      _InfoItem(title: 'Dividend Rate', value: formatNumber(stockData['dividendRate'])),
+          value:
+              '${(stockData['dividendYield'] != null ? stockData['dividendYield'] * 100 : 0).toStringAsFixed(2)}%'),
+      _InfoItem(
+          title: 'Dividend Rate',
+          value: formatNumber(stockData['dividendRate'])),
       _InfoItem(
           title: 'Ex-Dividend Date',
           value: stockData['exDividendDate'].toString()),
@@ -72,7 +93,8 @@ class AdditionalInfoWidget extends StatelessWidget {
               '${(stockData['earningsQuarterlyGrowth'] * 100).toStringAsFixed(2)}%'),
       _InfoItem(
           title: '52 Week Change',
-          value: '${(stockData['fiftyTwoWeekChange'] * 100).toStringAsFixed(2)}%'),
+          value:
+              '${(stockData['fiftyTwoWeekChange'] * 100).toStringAsFixed(2)}%'),
       _InfoItem(
           title: 'Target Mean Price',
           value: '\$${formatNumber(stockData['targetMeanPrice'])}'),
@@ -101,7 +123,7 @@ class AdditionalInfoWidget extends StatelessWidget {
           ),
           const SizedBox(height: 16),
           SizedBox(
-            height: 300, // 원하는 높이 조정
+            height: MediaQuery.of(context).size.height * 0.5, // 화면 높이의 50%
             child: TabBarView(
               children: [
                 _buildInfoGrid(overviewInfo),
@@ -133,7 +155,8 @@ class AdditionalInfoWidget extends StatelessWidget {
       ],
     );
   }
-    Widget _buildInfoGrid(List<_InfoItem> infoItems) {
+
+  Widget _buildInfoGrid(List<_InfoItem> infoItems) {
     return Padding(
       padding: const EdgeInsets.all(16.0),
       child: GridView.builder(
@@ -143,7 +166,7 @@ class AdditionalInfoWidget extends StatelessWidget {
           crossAxisCount: 2,
           crossAxisSpacing: 16,
           mainAxisSpacing: 16,
-          childAspectRatio: 3.5,
+          childAspectRatio: 2.5, // 더 큰 비율로 설정
         ),
         itemCount: infoItems.length,
         itemBuilder: (context, index) {
@@ -152,11 +175,7 @@ class AdditionalInfoWidget extends StatelessWidget {
       ),
     );
   }
-
-
 }
-
-
 
 class _InfoItem {
   final String title;

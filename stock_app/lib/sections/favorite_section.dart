@@ -8,6 +8,7 @@ import 'package:stock_app/utils/constants.dart';
 import 'package:provider/provider.dart';
 import 'package:stock_app/providers/auth_provider.dart'; // AuthProvider 가져오기
 import 'package:stock_app/providers/favorites_provider.dart';
+import 'package:stock_app/pages/stock_detail_page.dart';
 
 class FavoritesSection extends StatefulWidget {
   const FavoritesSection({super.key});
@@ -77,13 +78,17 @@ class _FavoritesSectionState extends State<FavoritesSection> {
               child: ListTile(
                 title: Text("${favorite['ticker']}".toUpperCase()),
                 subtitle: Text("Price: \$${favorite['price']}"),
-                trailing: IconButton(
-                  icon: Icon(Icons.remove_circle),
-                  onPressed: () {
-                    favoritesProvider.removeFavorite(
-                        favorite['ticker'], favorite['name']);
-                  },
-                ),
+                onTap: () {
+                  // 페이지 이동
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => StockDetailPage(
+                        ticker: favorite['ticker'],
+                      ),
+                    ),
+                  );
+                },
               ),
             )),
         const SizedBox(height: 20),

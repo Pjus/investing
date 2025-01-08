@@ -4,17 +4,17 @@ import '../widgets/market_index_card.dart'; // MarketIndexCard 위젯 정의 파
 const marketIndex = [
   MarketIndexCard(
     title: 'S&P 500',
-    symbol: '^GSPC',
+    ticker: '^GSPC',
     apiUrl: 'http://127.0.0.1:8000/api/market/snp500/',
   ),
   MarketIndexCard(
     title: 'Dow Jones',
-    symbol: '^DJI',
+    ticker: '^DJI',
     apiUrl: 'http://127.0.0.1:8000/api/market/dowjones/',
   ),
   MarketIndexCard(
     title: 'Nasdaq',
-    symbol: '^IXIC',
+    ticker: '^IXIC',
     apiUrl: 'http://127.0.0.1:8000/api/market/nasdaq/',
   ),
 ];

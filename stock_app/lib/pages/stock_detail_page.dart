@@ -10,9 +10,9 @@ import 'package:stock_app/utils/dark_mode_provider.dart';
 import 'package:stock_app/widgets/chart_time_range.dart';
 
 class StockDetailPage extends StatefulWidget {
-  final String symbol;
+  final String ticker;
 
-  const StockDetailPage({super.key, required this.symbol});
+  const StockDetailPage({super.key, required this.ticker});
 
   @override
   // ignore: library_private_types_in_public_api
@@ -37,7 +37,7 @@ class _StockDetailPageState extends State<StockDetailPage> {
     try {
       final response = await http.get(
         Uri.parse(
-            'http://127.0.0.1:8000/api/stock/${widget.symbol}/?period=1y&interval=1d'),
+            'http://127.0.0.1:8000/api/stock/${widget.ticker}/?period=1y&interval=1d'),
       );
 
       if (response.statusCode == 200) {
@@ -116,7 +116,7 @@ class _StockDetailPageState extends State<StockDetailPage> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.symbol),
+        title: Text(widget.ticker),
         // actions: [
         //   IconButton(
         //     icon: Icon(darkModeProvider.isDarkMode

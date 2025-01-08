@@ -15,10 +15,10 @@ def convert_unix_to_date(data, keys):
     return data
 
 
-def get_stock_data(symbol, period="1y", interval="1d"):
+def get_stock_data(ticker, period="1y", interval="1d"):
     try:
         # 종목 데이터 다운로드
-        stock = yf.Ticker(symbol)
+        stock = yf.Ticker(ticker)
         infos = stock.info  # 종목 상세 정보
         historical_data = stock.history(period=period, interval=interval)
 
@@ -71,7 +71,7 @@ def get_stock_data(symbol, period="1y", interval="1d"):
         stock_details = convert_unix_to_date(stock_details, date_keys)
         return_values = {
             "status": "success",
-            "symbol": symbol,
+            "ticker": ticker,
             "period": period,
             "interval": interval,
             "data": result,  # 과거 주가 데이터

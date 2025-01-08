@@ -14,6 +14,7 @@ from rest_framework_simplejwt.tokens import AccessToken
 
 class StockDataAPIView(APIView):
     def get(self, request, ticker):
+        print(request)
         period = request.GET.get("period", "1y")      # 기본값: 1년
         interval = request.GET.get("interval", "1d")  # 기본값: 1일
 

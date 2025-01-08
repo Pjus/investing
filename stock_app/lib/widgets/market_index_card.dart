@@ -5,12 +5,12 @@ import '../pages/stock_detail_page.dart'; // 디테일 페이지
 
 class MarketIndexCard extends StatefulWidget {
   final String title; // 예: S&P 500, Dow Jones
-  final String symbol; // 예: ^GSPC, ^DJI
+  final String ticker; // 예: ^GSPC, ^DJI
   final String apiUrl; // 예: http://127.0.0.1:8000/api/snp500/
 
   const MarketIndexCard({
     required this.title,
-    required this.symbol,
+    required this.ticker,
     required this.apiUrl,
     Key? key,
   }) : super(key: key);
@@ -117,7 +117,7 @@ class _MarketIndexCardState extends State<MarketIndexCard> {
           Navigator.push(
             context,
             MaterialPageRoute(
-              builder: (context) => StockDetailPage(symbol: widget.symbol),
+              builder: (context) => StockDetailPage(ticker: widget.ticker),
             ),
           );
         },
