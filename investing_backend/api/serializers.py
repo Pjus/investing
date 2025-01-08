@@ -1,5 +1,14 @@
 from rest_framework import serializers
+from .models import Stock
 
+
+class StockSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Stock
+        fields = [
+            'ticker', 'name', 'market_cap', 'price', 'change',
+            'change_percent', 'revenue', 'last_updated'
+        ]
 
 
 class StockHistoricalDataSerializer(serializers.Serializer):
@@ -13,7 +22,7 @@ class StockHistoricalDataSerializer(serializers.Serializer):
 
 class StockDetailSerializer(serializers.Serializer):
     status = serializers.CharField()
-    symbol = serializers.CharField()
+    ticker = serializers.CharField()
     period = serializers.CharField()
     interval = serializers.CharField()
     data = StockHistoricalDataSerializer(many=True)  # 과거 주가 데이터
@@ -70,7 +79,8 @@ class StockDetailSerializer(serializers.Serializer):
     forwardEps = serializers.FloatField(required=False, allow_null=True)
     earningsQuarterlyGrowth = serializers.FloatField(
         required=False, allow_null=True)
-    fiftyTwoWeekChange = serializers.FloatField(required=False, allow_null=True)
+    fiftyTwoWeekChange = serializers.FloatField(
+        required=False, allow_null=True)
 
     # 기타
     financialCurrency = serializers.CharField(required=False, allow_null=True)

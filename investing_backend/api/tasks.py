@@ -1,6 +1,7 @@
 from .utils import fetch_stocks_data
 from .models import Stock
 
+
 def save_stocks_to_db():
     stocks_data = fetch_stocks_data()
 
@@ -11,7 +12,7 @@ def save_stocks_to_db():
     for stock in stocks_data:
         try:
             # 데이터 매핑
-            symbol = stock.get('s')
+            ticker = stock.get('s')
             name = stock.get('n')
             market_cap = stock.get('marketCap')
             price = stock.get('price')
@@ -20,7 +21,7 @@ def save_stocks_to_db():
 
             # 데이터 저장 또는 업데이트
             Stock.objects.update_or_create(
-                symbol=symbol,
+                ticker=ticker,
                 defaults={
                     'name': name,
                     'market_cap': market_cap,

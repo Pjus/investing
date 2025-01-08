@@ -39,6 +39,8 @@ else:
     CORS_ALLOWED_ORIGINS = [
         "http://localhost:10380",  # Flutter 웹 실행 URL
         "http://127.0.0.1:10380",  # 필요 시 추가
+        "http://127.0.0.1:8000",
+        "http://localhost:8000",
     ]
 
 CORS_ALLOW_CREDENTIALS = True  # 쿠키나 인증 정보가 포함된 요청 허용
@@ -68,22 +70,20 @@ INSTALLED_APPS = [
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
         'rest_framework.authentication.SessionAuthentication',
-        'rest_framework.authentication.BasicAuthentication',
-        'rest_framework.authentication.TokenAuthentication',  # 필요하면 추가
-    ],
-    'DEFAULT_PERMISSION_CLASSES': [
-        'rest_framework.permissions.IsAuthenticated',  # 기본 권한 설정
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
     ],
 }
 
 
 SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=30),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),
-    'ROTATE_REFRESH_TOKENS': True,
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
+    'ROTATE_REFRESH_TOKENS': True,  # 리프레시 토큰 사용 시 자동 갱신
     'BLACKLIST_AFTER_ROTATION': True,
+    'ALGORITHM': 'HS256',
+    'SIGNING_KEY': SECRET_KEY,
+    'AUTH_HEADER_TYPES': ('Bearer',),
 }
-
 MIDDLEWARE = [
     'corsheaders.middleware.CorsMiddleware',
     "django.middleware.security.SecurityMiddleware",

@@ -4,22 +4,32 @@ from rest_framework import status
 import pandas as pd
 import yfinance as yf
 from finvizfinance.news import News
-from .utils import get_stock_data
+from .utils import get_stock_data, fetch_stocks_data
 from .models import Stock
 from .serializers import StockDetailSerializer
+from rest_framework.permissions import IsAuthenticated
+
+from rest_framework_simplejwt.tokens import AccessToken
 
 
 class StockDataAPIView(APIView):
-    def get(self, request, symbol):
+    def get(self, request, ticker):
         period = request.GET.get("period", "1y")      # 기본값: 1년
         interval = request.GET.get("interval", "1d")  # 기본값: 1일
 
-        stock_data = get_stock_data(symbol, period=period, interval=interval)
+        stock_data = get_stock_data(ticker, period=period, interval=interval)
 
         if stock_data['status'] == 'error':
             return Response(stock_data, status=status.HTTP_400_BAD_REQUEST)
 
         serializer = StockDetailSerializer(stock_data)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+class FetchStocksAPIView(APIView):
+    def get(self, request):
+        stocks = fetch_stocks_data()
+        serializer = StockDetailSerializer(stocks, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -53,7 +63,7 @@ class SP500APIView(APIView):
             pct_change = (last_close - open_price) / open_price * 100
 
             result = {
-                "symbol": ticker,
+                "ticker": ticker,
                 "last_close": round(last_close, 2),
                 "change_net": round(change, 2),
                 "change_percent": round(pct_change, 2),
@@ -74,7 +84,8 @@ class NewsAPIView(APIView):
             news_data = all_news['news']  # 뉴스 리스트
 
             # Pandas DataFrame으로 변환
-            df = pd.DataFrame(news_data, columns=["Date", "Title", "Source", "Link"])
+            df = pd.DataFrame(news_data, columns=[
+                              "Date", "Title", "Source", "Link"])
 
             # 명시적으로 비어 있는지 확인
             if df.empty:

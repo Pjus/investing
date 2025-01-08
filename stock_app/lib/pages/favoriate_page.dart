@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:stock_app/providers/auth_provider.dart'; // AuthProvider 가져오기
+import 'package:stock_app/providers/favorites_provider.dart';
 
 class FavoritesPage extends StatefulWidget {
   const FavoritesPage({super.key});
@@ -10,211 +10,132 @@ class FavoritesPage extends StatefulWidget {
 }
 
 class _FavoritesPageState extends State<FavoritesPage> {
-  List<Map<String, dynamic>> favoriteStocks = []; // 즐겨찾기 주식 목록
+  List<Map<String, dynamic>> favoriteStocks = [];
   bool isLoading = true;
+  final TextEditingController _searchController = TextEditingController();
 
   @override
   void initState() {
     super.initState();
-    fetchFavoriteStocks();
+    final favoritesProvider =
+        Provider.of<FavoritesProvider>(context, listen: false);
+    favoritesProvider.fetchAllStocks(context); // 전체 데이터를 초기화
+    favoritesProvider.fetchFavorites(context); // 전체 데이터를 초기화
   }
 
-  Future<void> fetchFavoriteStocks() async {
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
-
-    if (!authProvider.isLoggedIn) {
-      setState(() {
-        isLoading = false;
-      });
-      return;
-    }
-
-    try {
-      // 백엔드 API 호출로 즐겨찾기 목록 가져오기
-      // 예시: API에서 데이터 가져오기
-      // final response = await http.get(Uri.parse("http://127.0.0.1:8000/api/favorites/"),
-      //     headers: {"Authorization": "Bearer ${authProvider.token}"});
-
-      // 아래는 테스트 데이터를 사용하는 코드
-      await Future.delayed(const Duration(seconds: 1)); // 가상 대기 시간
-      setState(() {
-        favoriteStocks = [
-          {"ticker": "AAPL", "name": "Apple Inc.", "price": 178.34},
-          {"ticker": "TSLA", "name": "Tesla Inc.", "price": 725.50},
-        ];
-        isLoading = false;
-      });
-    } catch (e) {
-      setState(() {
-        isLoading = false;
-      });
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to load favorites: $e')),
-      );
-    }
-  }
-
-  Future<void> addFavoriteStock(String ticker, String name) async {
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
-
-    if (!authProvider.isLoggedIn) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please log in to add favorites.')),
-      );
-      return;
-    }
-
-    try {
-      // 백엔드 API에 즐겨찾기 추가 요청
-      // 예시: await http.post(Uri.parse("http://127.0.0.1:8000/api/favorites/"),
-      //     headers: {"Authorization": "Bearer ${authProvider.token}"}, body: {"ticker": ticker});
-
-      setState(() {
-        favoriteStocks.add({"ticker": ticker, "name": name});
-      });
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Stock added to favorites.')),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to add favorite: $e')),
-      );
-    }
-  }
-
-  Future<void> removeFavoriteStock(String ticker) async {
-    final authProvider = Provider.of<AuthProvider>(context, listen: false);
-
-    if (!authProvider.isLoggedIn) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please log in to remove favorites.')),
-      );
-      return;
-    }
-
-    try {
-      // 백엔드 API에 즐겨찾기 삭제 요청
-      // 예시: await http.delete(Uri.parse("http://127.0.0.1:8000/api/favorites/$ticker"),
-      //     headers: {"Authorization": "Bearer ${authProvider.token}"});
-
-      setState(() {
-        favoriteStocks.removeWhere((stock) => stock['ticker'] == ticker);
-      });
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Stock removed from favorites.')),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to remove favorite: $e')),
-      );
-    }
+  void addFavorite(String ticker) {
+    // Add favorite logic
+    final favoritesProvider =
+        Provider.of<FavoritesProvider>(context, listen: false);
+    favoritesProvider.addFavorite(context, ticker, "Sample Name");
   }
 
   @override
   Widget build(BuildContext context) {
-    final authProvider = Provider.of<AuthProvider>(context);
+    final favoritesProvider = Provider.of<FavoritesProvider>(context);
 
-    if (!authProvider.isLoggedIn) {
-      return Scaffold(
-        appBar: AppBar(
-          title: const Text("Favorites"),
-          backgroundColor: Colors.black,
-        ),
-        body: Center(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              const Text(
-                'Please log in to view your favorites.',
-                style: TextStyle(color: Colors.grey, fontSize: 16),
-              ),
-              const SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: () => Navigator.pushNamed(context, '/login'),
-                child: const Text('Log In'),
-              ),
-            ],
+    // 즐겨찾기 정렬 및 중복 제거
+    List<Map<String, dynamic>> sortedStocks = [
+      ...{...favoritesProvider.favorites}, // 즐겨찾기 리스트 중복 제거
+      ...{
+        ...favoritesProvider.allStocks.where(
+          (stock) => !favoritesProvider.favorites.any(
+            (favorite) =>
+                (favorite['ticker']?.toLowerCase() ?? '') ==
+                (stock['ticker']?.toLowerCase() ?? ''),
           ),
         ),
-      );
-    }
+      }, // 비즐겨찾기 리스트 중복 제거
+    ];
 
     return Scaffold(
       appBar: AppBar(
         title: const Text("Favorites"),
         backgroundColor: Colors.black,
       ),
-      body: isLoading
-          ? const Center(
-              child: CircularProgressIndicator(),
-            )
-          : Column(
+      body: Column(
+        children: [
+          // 상단 검색창과 플러스 버튼
+          Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Row(
               children: [
-                // 검색 입력 필드
-                Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Row(
-                    children: [
-                      Expanded(
-                        child: TextField(
-                          decoration: const InputDecoration(
-                            hintText: 'Enter stock ticker...',
-                            border: OutlineInputBorder(),
-                          ),
-                          onSubmitted: (ticker) {
-                            addFavoriteStock(
-                                ticker, "Sample Name"); // 간단한 추가 기능
-                          },
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      ElevatedButton(
-                        onPressed: () {
-                          // 간단한 예: Apple 추가
-                          addFavoriteStock("AAPL", "Apple Inc.");
-                        },
-                        child: const Text("Add"),
-                      ),
-                    ],
+                Expanded(
+                  child: TextField(
+                    controller: _searchController,
+                    decoration: InputDecoration(
+                      hintText: 'Enter a ticker (e.g., AAPL)',
+                      border: OutlineInputBorder(),
+                    ),
+                    onChanged:
+                        favoritesProvider.filterFavorites, // 검색어 변경 시 필터링
+                    onSubmitted: (value) {
+                      // 검색 또는 추가 실행
+                      addFavorite(value.trim());
+                      _searchController.clear();
+                    },
                   ),
                 ),
-
-                // 즐겨찾기 목록
-                Expanded(
-                  child: favoriteStocks.isEmpty
-                      ? const Center(
-                          child: Text(
-                            "No favorites added.",
-                            style: TextStyle(color: Colors.grey, fontSize: 16),
-                          ),
-                        )
-                      : ListView.builder(
-                          itemCount: favoriteStocks.length,
-                          itemBuilder: (context, index) {
-                            final stock = favoriteStocks[index];
-                            return Card(
-                              child: ListTile(
-                                title: Text(stock['name']),
-                                subtitle: Text(
-                                  "Ticker: ${stock['ticker']}, Price: \$${stock['price'].toStringAsFixed(2)}",
-                                ),
-                                trailing: IconButton(
-                                  icon: const Icon(Icons.remove_circle),
-                                  onPressed: () =>
-                                      removeFavoriteStock(stock['ticker']),
-                                ),
-                                onTap: () {
-                                  // TODO: 주식 상세 페이지로 이동
-                                },
-                              ),
-                            );
-                          },
-                        ),
+                const SizedBox(width: 10),
+                IconButton(
+                  icon: const Icon(Icons.add, color: Colors.green),
+                  onPressed: () {
+                    // 플러스 버튼 눌렀을 때
+                    final ticker = _searchController.text.trim();
+                    if (ticker.isNotEmpty) {
+                      addFavorite(ticker);
+                      _searchController.clear();
+                    }
+                  },
                 ),
               ],
             ),
+          ),
+          // 전체 목록
+          Expanded(
+              child: favoritesProvider.isLoading
+                  ? const Center(child: CircularProgressIndicator())
+                  : ListView.builder(
+                      itemCount: favoritesProvider.allStocks.length,
+                      itemBuilder: (context, index) {
+                        final stock = sortedStocks[index];
+                        final isFavorite =
+                            favoritesProvider.favorites.any((favorite) {
+                          final favoriteTicker =
+                              favorite['ticker']?.toLowerCase() ?? '';
+                          final stockTicker =
+                              stock['ticker']?.toLowerCase() ?? '';
+                          return favoriteTicker == stockTicker;
+                        }); // 즐겨찾기 여부 확인
+                        return Card(
+                          child: ListTile(
+                            title: Text(stock['ticker'] ?? 'Unknown'),
+                            subtitle: Text("${stock['name']}".toUpperCase()),
+                            trailing: IconButton(
+                              icon: Icon(
+                                isFavorite
+                                    ? Icons.favorite
+                                    : Icons.favorite_border,
+                                color: isFavorite ? Colors.red : null,
+                              ),
+                              onPressed: () {
+                                if (isFavorite) {
+                                  // 즐겨찾기에서 제거
+                                  favoritesProvider.removeFavorite(
+                                      context, stock['ticker']);
+                                } else {
+                                  // 즐겨찾기에 추가
+                                  favoritesProvider.addFavorite(
+                                      context, stock['ticker'], stock['name']);
+                                }
+                              },
+                            ),
+                          ),
+                        );
+                      },
+                    )),
+        ],
+      ),
     );
   }
 }

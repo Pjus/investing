@@ -5,5 +5,5 @@ class APIConstants {
   static String get marketIndexEndpoint => '$baseUrl/market/';
   static String get stockDataEndpoint => '$baseUrl/stock/';
   static String get favoriteEndpoint => '$baseUrl/favorite/list/';
-  static String get favoriteAddEndpoint => '$baseUrl/favorite/add/';
+  static String get favoriteDeleteEndpoint => '$baseUrl/favorite/delete/';
 }

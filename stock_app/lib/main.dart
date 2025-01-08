@@ -5,20 +5,17 @@ import 'package:stock_app/providers/auth_provider.dart';
 import 'package:stock_app/providers/news_provider.dart';
 import 'package:stock_app/routes.dart';
 import 'package:stock_app/utils/dark_mode_provider.dart';
+import 'package:stock_app/providers/favorites_provider.dart';
 
 void main() {
   runApp(
     MultiProvider(
       providers: [
         ChangeNotifierProvider(
-          create: (_) => AuthProvider()..checkLoginStatus(),  // AuthProvider 추가
-        ),
-        ChangeNotifierProvider(
-          create: (_) => DarkModeProvider(), // 다크 모드 관리 Provider 추가
-        ),
-        ChangeNotifierProvider(
-          create: (_) => NewsProvider(), // NewsProvider 추가
-        ), 
+            create: (_) => AuthProvider()..checkLoginStatus()),
+        ChangeNotifierProvider(create: (_) => DarkModeProvider()),
+        ChangeNotifierProvider(create: (_) => NewsProvider()),
+        ChangeNotifierProvider(create: (_) => FavoritesProvider()),
       ],
       child: MyApp(),
     ),
@@ -37,8 +34,8 @@ class MyApp extends StatelessWidget {
         brightness:
             darkModeProvider.isDarkMode ? Brightness.dark : Brightness.light,
       ),
-      home: MainScreen(),
-      routes: appRoutes,
+      home: const MainScreen(),
+      routes: appRoutes, // 추가 라우트 관리
     );
   }
 }

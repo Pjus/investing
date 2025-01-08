@@ -5,6 +5,10 @@ import '../pages/favoriate_page.dart';
 
 import 'package:stock_app/utils/constants.dart';
 
+import 'package:provider/provider.dart';
+import 'package:stock_app/providers/favorites_provider.dart';
+import 'package:stock_app/providers/auth_provider.dart'; // AuthProvider 가져오기
+
 class FavoritesSection extends StatefulWidget {
   const FavoritesSection({super.key});
 
@@ -24,8 +28,22 @@ class _FavoritesSectionState extends State<FavoritesSection> {
   }
 
   Future<void> fetchFavorites() async {
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+
+    if (!authProvider.isLoggedIn) {
+      setState(() {
+        isLoading = false;
+      });
+      return;
+    }
+
     try {
-      final response = await http.get(Uri.parse(APIConstants.favoriteEndpoint));
+      final response = await http.get(
+        Uri.parse(APIConstants.favoriteEndpoint),
+        headers: {
+          'Authorization': 'Bearer ${authProvider.token}',
+        },
+      );
 
       if (response.statusCode == 200) {
         final List<dynamic> data = json.decode(response.body);
@@ -49,6 +67,12 @@ class _FavoritesSectionState extends State<FavoritesSection> {
 
   @override
   Widget build(BuildContext context) {
+    final favoritesProvider = Provider.of<FavoritesProvider>(context);
+    if (favoritesProvider.isLoading) {
+      return Center(
+        child: CircularProgressIndicator(),
+      );
+    }
     if (isLoading) {
       return const Center(
         child: CircularProgressIndicator(),
@@ -56,26 +80,41 @@ class _FavoritesSectionState extends State<FavoritesSection> {
     }
 
     if (isAdding) {
-      return FavoritesPage(onBack: () {
-        setState(() {
-          isAdding = false; // Add More 화면에서 돌아오기
-        });
-      });
+      return Navigator(
+        onGenerateRoute: (settings) {
+          return MaterialPageRoute(
+            builder: (context) => FavoritesPage(),
+          );
+        },
+      );
     }
 
-    if (favorites.isEmpty) {
-      return const Center(
-        child: Text(
-          "No favorites available.",
-          style: TextStyle(color: Colors.white, fontSize: 18),
-        ),
+    if (favoritesProvider.favorites.isEmpty) {
+      return Column(
+        children: [
+          Center(
+            child: Text(
+              "No favorites added.",
+              style: TextStyle(color: Colors.grey, fontSize: 16),
+            ),
+          ),
+          const SizedBox(height: 20),
+          Center(
+            child: ElevatedButton(
+              onPressed: () {
+                Navigator.pushNamed(context, '/favorites'); // Favorite 페이지로 이동
+              },
+              child: const Text("Add More"),
+            ),
+          ),
+        ],
       );
     }
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text(
+        Text(
           "Favorites",
           style: TextStyle(
             color: Colors.white,
@@ -83,23 +122,18 @@ class _FavoritesSectionState extends State<FavoritesSection> {
             fontWeight: FontWeight.bold,
           ),
         ),
-        const SizedBox(height: 10),
-        ...favorites.map((favorite) => Card(
-              color: Colors.grey[850],
+        SizedBox(height: 10),
+        ...favoritesProvider.favorites.map((favorite) => Card(
               child: ListTile(
-                leading: const Icon(Icons.star, color: Colors.yellow),
-                title: Text(
-                  favorite['ticker'],
-                  style: const TextStyle(color: Colors.white),
+                title: Text("${favorite['ticker']}".toUpperCase()),
+                subtitle: Text("Price: \$${favorite['current_price']}"),
+                trailing: IconButton(
+                  icon: Icon(Icons.remove_circle),
+                  onPressed: () {
+                    favoritesProvider.removeFavorite(
+                        favorite['ticker'], favorite['name']);
+                  },
                 ),
-                subtitle: Text(
-                  "Price: \$${favorite['price'].toStringAsFixed(2)}",
-                  style: const TextStyle(color: Colors.grey),
-                ),
-                trailing: const Icon(Icons.chevron_right, color: Colors.white),
-                onTap: () {
-                  // 특정 종목 상세 페이지로 이동 (선택적으로 구현)
-                },
               ),
             )),
         const SizedBox(height: 20),

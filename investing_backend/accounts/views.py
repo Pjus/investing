@@ -31,6 +31,5 @@ class RegisterAPIView(APIView):
         return Response({'message': 'User created successfully'}, status=status.HTTP_201_CREATED)
 
 
-
 class CustomTokenObtainPairView(TokenObtainPairView):
     serializer_class = CustomTokenObtainPairSerializer
