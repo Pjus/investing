@@ -25,28 +25,27 @@ SECRET_KEY = "django-insecure-#-v8$1s2ko-himp-zllm*ad-qhmsvru3xv^t2-8jmxo!&d40fz
 
 # SECURITY WARNING: don't run with debug turned on in production!
 
-ALLOWED_HOSTS = ['10.0.2.2', 'localhost', '127.0.0.1', '192.168.1.3']
+ALLOWED_HOSTS = ['*']
 
 
 DEBUG = True
 
 if DEBUG:
-    # 모든 도메인 허용 (개발 환경)
     CORS_ALLOW_ALL_ORIGINS = True
 else:
-    # 특정 도메인만 허용 (프로덕션 환경)
     CORS_ALLOW_ALL_ORIGINS = False
     CORS_ALLOWED_ORIGINS = [
-        "http://localhost:10380",  # Flutter 웹 실행 URL
-        "http://127.0.0.1:10380",  # 필요 시 추가
-        "http://127.0.0.1:8000",
-        "http://localhost:8000",
+        'http://example.com',  # 허용할 도메인 추가
+        'http://yourdomain.com',
     ]
+
 
 CORS_ALLOW_CREDENTIALS = True  # 쿠키나 인증 정보가 포함된 요청 허용
 CORS_ALLOW_HEADERS = [
     'content-type',  # Content-Type 헤더 허용
     'authorization',  # Authorization 헤더 허용
+    'x-csrftoken',  # CSRF 토큰 관련 헤더
+    'x-requested-with',  # Ajax 요청 관련 헤더
 ]
 
 # Application definition
@@ -162,7 +161,9 @@ USE_L10N = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
-STATIC_URL = "static/"
+STATIC_URL = '/static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
